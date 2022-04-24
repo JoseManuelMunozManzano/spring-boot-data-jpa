@@ -9,7 +9,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
-// Se indica el nombre para especificar en el controlador la versión concreta que se quiere inyectar
 @Repository("clienteDaoJPA")
 public class ClienteDaoImpl implements IClienteDao {
 
@@ -22,5 +21,14 @@ public class ClienteDaoImpl implements IClienteDao {
         // Para evitar type safety unchecked y tener que poner suppress warning
         TypedQuery<Cliente> query = em.createQuery("from Cliente", Cliente.class);
         return query.getResultList();
+    }
+
+    @Override
+    @Transactional
+    public void save(Cliente cliente) {
+        // persist() almacena un objeto entity en el contexto de persistencia (JPA) y en la base de datos.
+        // Una vez se realice el commit() y el flush() va a sincronizar con la BD y va a realizar el insert
+        // en la tabla. To-do esto se hace de forma automática.
+        em.persist(cliente);
     }
 }
