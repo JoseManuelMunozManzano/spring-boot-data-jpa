@@ -52,8 +52,14 @@
                     <input type="text" th:field="*{email}" class="form-control"/>
                 </div>
             </div>
-                <!-- NOTA: La fecha, por ahora, se informa automáticamente al guardar. Ver entity Cliente  -->
-                <!-- método prePersist()  -->
+
+            <div class="form-group row">
+                <label class="col-form-label col-sm-2">Fecha</label>
+                <div class="col-sm-6">
+                    <input type="text" th:field="*{createAt}" class="form-control"/>
+                </div>
+            </div>
+
             <div class="form-group row">
                 <div class="col-sm-6">
                     <input type="submit" value="Crear Cliente" class="btn btn-primary"/>

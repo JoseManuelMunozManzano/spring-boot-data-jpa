@@ -1,5 +1,7 @@
 package com.jmunoz.springboot.app.models.entity;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
@@ -20,20 +22,13 @@ public class Cliente implements Serializable {
     private String apellido;
     private String email;
 
+    // Se quita la anotación @PrePersist porque la fecha ahora se añade mediante el formulario.
+    // Por defecto SpringBoot maneja el formato de fecha según nuestra localización (MM/dd /yyyy)
+    // Con la anotación @DateTimeFormat podemos indicar el patrón de la fecha
     @Column(name = "create_at")
     @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createAt;
-
-    // Antes de que se guarde en la BD asignamos la fecha, ya que por ahora no se informa en la vista del formulario.
-    // Es necesario informar con la anotación @PrePersist para que funcione este método y se ejecute como
-    // un evento que es parte del ciclo de vida de la clase Entity, manejada por el EntityManager.
-    //
-    // Ahora, justo antes de llamar al método persist() en ClienteDaoImpl, método save(), se llamará a este
-    // método de forma automática.
-    @PrePersist
-    public void prePersist() {
-        createAt = new Date();
-    }
 
     public Long getId() {
         return id;
