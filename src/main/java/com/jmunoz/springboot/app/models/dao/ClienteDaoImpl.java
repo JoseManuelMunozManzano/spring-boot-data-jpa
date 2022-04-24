@@ -9,22 +9,10 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
-// @Repository es una anotación de Spring para marcar la clase como componente de persistencia, de acceso a datos.
-// Internamente es un estereotipo de @Component.
-// Además se encarga de traducir las excepciones que puedan ocurrir, como DataAccessException
-@Repository
+// Se indica el nombre para especificar en el controlador la versión concreta que se quiere inyectar
+@Repository("clienteDaoJPA")
 public class ClienteDaoImpl implements IClienteDao {
 
-    // EntityManager se encarga de manejar las clases de entidades.
-    // El ciclo de vida las persiste dentro del contexto, las actualiza, las elimina, puede realizar consultas...
-    // es decir, todas las operaciones a la BD pero a nivel de objeto, a través de las clases Entity.
-    // Por lo tanto las consultas son siempre de JPA. Van a la clase Entity, no a la tabla.
-    //
-    // @PersistenceContext
-    // De forma automática inyecta el EntityManager según la configuración de la unidad de persistencia que contiene
-    // el DataSource, el proveedor JPA. Si no se configura ningún tipo de motor en application.properties, por defecto
-    // Spring Boot usa la BD H2 embebida en la aplicación.
-    // Por ahora se va a usar la configuración por defecto, H2, y después se va a trabajar con MySql.
     @PersistenceContext
     private EntityManager em;
 
