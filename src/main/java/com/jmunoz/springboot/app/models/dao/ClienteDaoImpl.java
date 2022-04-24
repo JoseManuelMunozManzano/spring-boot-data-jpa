@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 // @Repository es una anotación de Spring para marcar la clase como componente de persistencia, de acceso a datos.
@@ -30,6 +31,8 @@ public class ClienteDaoImpl implements IClienteDao {
     @Override
     @Transactional(readOnly = true)
     public List<Cliente> findAll() {
-        return em.createQuery("from Cliente").getResultList();
+        // Para evitar type safety unchecked y tener que poner suppress warning
+        TypedQuery<Cliente> query = em.createQuery("from Cliente", Cliente.class);
+        return query.getResultList();
     }
 }
