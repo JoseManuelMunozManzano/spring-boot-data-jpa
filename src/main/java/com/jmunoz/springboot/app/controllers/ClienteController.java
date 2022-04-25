@@ -10,11 +10,17 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import javax.validation.Valid;
 import java.util.Map;
 
+// En vez de usar el campo hidden con el id en el formulario form.html, se usa @SessionAttributes
+// Es más seguro y mucho más recomendado
+// Se tiene que completar. Ver SessionStatus más abajo.
 @Controller
+@SessionAttributes("cliente")
 public class ClienteController {
 
     @Autowired
@@ -39,7 +45,7 @@ public class ClienteController {
     }
 
     @RequestMapping(value = "/form", method = RequestMethod.POST)
-    public String guardar(@Valid Cliente cliente, BindingResult result, Model model) {
+    public String guardar(@Valid Cliente cliente, BindingResult result, Model model, SessionStatus status) {
 
         if (result.hasErrors()) {
             model.addAttribute("titulo", "Formulario de Clientes");
@@ -47,6 +53,8 @@ public class ClienteController {
         }
 
         clienteDao.save(cliente);
+        // Para eliminar el objeto cliente de la sesión
+        status.setComplete();
         return "redirect:listar";
     }
 

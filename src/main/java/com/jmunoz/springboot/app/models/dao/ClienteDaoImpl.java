@@ -26,9 +26,8 @@ public class ClienteDaoImpl implements IClienteDao {
     @Override
     @Transactional
     public void save(Cliente cliente) {
-        // Este id viene del campo hidden de form.html. Para editar estará informado y para alta estará a null
+        // Este id viene de los atributos de la sesión. Para editar estará informado y para alta estará a null
         if (cliente.getId() != null && cliente.getId() > 0) {
-            // Con merge se actualizan los datos existentes
             em.merge(cliente);
         } else {
             em.persist(cliente);
@@ -37,9 +36,6 @@ public class ClienteDaoImpl implements IClienteDao {
 
     @Override
     public Cliente findOne(Long id) {
-        // Se usa el método find del entity manager (JPA). Se le pasa la clase y el id.
-        // De forma automática, JPA va a la BD y nos entrega el objeto cliente que tiene ese id.
-        // No olvidar que queda manejado dentro del contexto de persistencia.
         return em.find(Cliente.class, id);
     }
 }
