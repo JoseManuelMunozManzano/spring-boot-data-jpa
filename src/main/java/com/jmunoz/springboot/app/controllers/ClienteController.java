@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -16,7 +17,6 @@ import java.util.Map;
 @Controller
 public class ClienteController {
 
-    // Aunque no haría falta porque solo hay 1, se indica el bean concreto que queremos instanciar
     @Autowired
     @Qualifier("clienteDaoJPA")
     private IClienteDao clienteDao;
@@ -38,22 +38,31 @@ public class ClienteController {
         return "form";
     }
 
-    // Con BindingResult se muestran en la vista los mensajes de error de las validaciones
-    // Siempre se ubica junto al objeto del formulario. Los dos van siempre juntos
     @RequestMapping(value = "/form", method = RequestMethod.POST)
     public String guardar(@Valid Cliente cliente, BindingResult result, Model model) {
 
         if (result.hasErrors()) {
             model.addAttribute("titulo", "Formulario de Clientes");
-            // El cliente se pasa de forma automática cuando el tipo de la clase (Cliente) se llame igual
-            // que el nombre con el cual lo estamos pasando a la vista (cliente)
-            // No se tiene en cuenta que el tipo de la clase empieza en mayúsculas y el atributo to-do en minúsculas.
-            // Si se llamase distinto habría que informar el parámetro arriba de la siguiente forma:
-            // @Valid @ModelAttribute("el_nombre") Cliente cliente
             return "form";
         }
 
         clienteDao.save(cliente);
         return "redirect:listar";
+    }
+
+    @RequestMapping(value = "/form/{id}")
+    public String editar(@PathVariable(value = "id") Long id, Map<String, Object> model) {
+        Cliente cliente = null;
+
+        // Este id viene del campo hidden de form.html. Para editar estará informado y para alta estará a null
+        if (id > 0 ){
+            cliente = clienteDao.findOne(id);
+        } else {
+            return "redirect:/listar";
+        }
+
+        model.put("cliente", cliente);
+        model.put("titulo", "Editar Cliente");
+        return "form";
     }
 }

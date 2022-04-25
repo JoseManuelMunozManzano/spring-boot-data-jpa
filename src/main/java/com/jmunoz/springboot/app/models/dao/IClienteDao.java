@@ -5,7 +5,9 @@ import com.jmunoz.springboot.app.models.entity.Cliente;
 import java.util.List;
 
 public interface IClienteDao {
-    public List<Cliente> findAll();
+    List<Cliente> findAll();
 
-    public void save(Cliente cliente);
+    void save(Cliente cliente);
+
+    Cliente findOne(Long id);
 }
