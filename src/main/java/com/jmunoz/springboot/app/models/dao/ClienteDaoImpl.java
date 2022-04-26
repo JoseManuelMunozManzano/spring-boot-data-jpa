@@ -24,9 +24,14 @@ public class ClienteDaoImpl implements IClienteDao {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Cliente findOne(Long id) {
+        return em.find(Cliente.class, id);
+    }
+
+    @Override
     @Transactional
     public void save(Cliente cliente) {
-        // Este id viene de los atributos de la sesión. Para editar estará informado y para alta estará a null
         if (cliente.getId() != null && cliente.getId() > 0) {
             em.merge(cliente);
         } else {
@@ -35,7 +40,9 @@ public class ClienteDaoImpl implements IClienteDao {
     }
 
     @Override
-    public Cliente findOne(Long id) {
-        return em.find(Cliente.class, id);
+    @Transactional
+    public void delete(Long id) {
+        // Este id viene de los atributos de la sesión
+        em.remove(findOne(id));
     }
 }

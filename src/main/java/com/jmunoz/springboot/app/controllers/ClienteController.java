@@ -73,4 +73,14 @@ public class ClienteController {
         model.put("titulo", "Editar Cliente");
         return "form";
     }
+
+    @RequestMapping(value = "/eliminar/{id}")
+    public String eliminar(@PathVariable Long id) {
+
+        if (id > 0) {
+            clienteDao.delete(id);
+        }
+
+        return "redirect:/listar";
+    }
 }
