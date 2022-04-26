@@ -1,7 +1,7 @@
 package com.jmunoz.springboot.app.controllers;
 
-import com.jmunoz.springboot.app.models.dao.IClienteDao;
 import com.jmunoz.springboot.app.models.entity.Cliente;
+import com.jmunoz.springboot.app.models.service.IClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -24,13 +24,12 @@ import java.util.Map;
 public class ClienteController {
 
     @Autowired
-    @Qualifier("clienteDaoJPA")
-    private IClienteDao clienteDao;
+    private IClienteService clienteService;
 
     @RequestMapping(value = "/listar", method = RequestMethod.GET)
     public String listar(Model model) {
         model.addAttribute("titulo", "Listado de clientes");
-        model.addAttribute("clientes", clienteDao.findAll());
+        model.addAttribute("clientes", clienteService.findAll());
 
         return "listar";
     }
@@ -52,7 +51,7 @@ public class ClienteController {
             return "form";
         }
 
-        clienteDao.save(cliente);
+        clienteService.save(cliente);
         // Para eliminar el objeto cliente de la sesión
         status.setComplete();
         return "redirect:listar";
@@ -64,7 +63,7 @@ public class ClienteController {
 
         // Este id viene del campo hidden de form.html. Para editar estará informado y para alta estará a null
         if (id > 0 ){
-            cliente = clienteDao.findOne(id);
+            cliente = clienteService.findOne(id);
         } else {
             return "redirect:/listar";
         }
@@ -78,7 +77,7 @@ public class ClienteController {
     public String eliminar(@PathVariable Long id) {
 
         if (id > 0) {
-            clienteDao.delete(id);
+            clienteService.delete(id);
         }
 
         return "redirect:/listar";
