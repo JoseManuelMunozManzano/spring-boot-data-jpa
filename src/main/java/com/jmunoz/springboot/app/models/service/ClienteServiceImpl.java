@@ -8,12 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-// Una clase service está basada en el patrón de diseño Facade.
-// Es un único punto de acceso a distintos DAOs o repository.
-// En el ejemplo hay un DAO, pero podría haber muchos y dentro de un método se podría interactuar con distintos DAO.
-// Se evita acceder directamente a los DAO desde los controladores.
-// También se puede manejar la transacción sin tener que implementar las anotaciones @Transactional en el DAO.
-// Nos hemos traído la anotación @Transactional de la clase ClienteDaoImpl aquí.
 @Service
 public class ClienteServiceImpl implements IClienteService {
 
@@ -23,13 +17,16 @@ public class ClienteServiceImpl implements IClienteService {
     @Override
     @Transactional(readOnly = true)
     public List<Cliente> findAll() {
-        return clienteDao.findAll();
+        // CrudRepository devuelve un Iterable, no un List<>
+        return (List<Cliente>) clienteDao.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Cliente findOne(Long id) {
-        return clienteDao.findOne(id);
+        // findOne no existe en CrudRepository. Se llama findById
+        // Retorna un Optional
+        return clienteDao.findById(id).orElse(null);
     }
 
     @Override
@@ -41,6 +38,7 @@ public class ClienteServiceImpl implements IClienteService {
     @Override
     @Transactional
     public void delete(Long id) {
-        clienteDao.delete(id);
+        // delete no existe en CrudRepository. Se llama deleteById
+        clienteDao.deleteById(id);
     }
 }
