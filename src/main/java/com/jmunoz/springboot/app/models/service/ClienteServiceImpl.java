@@ -3,6 +3,8 @@ package com.jmunoz.springboot.app.models.service;
 import com.jmunoz.springboot.app.models.dao.IClienteDao;
 import com.jmunoz.springboot.app.models.entity.Cliente;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,13 @@ public class ClienteServiceImpl implements IClienteService {
     public List<Cliente> findAll() {
         // CrudRepository devuelve un Iterable, no un List<>
         return (List<Cliente>) clienteDao.findAll();
+    }
+
+    // Paginación. Se devuelve un Page, que es un subconjunto de Iterable
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Cliente> findAll(Pageable pageable) {
+        return clienteDao.findAll(pageable);
     }
 
     @Override

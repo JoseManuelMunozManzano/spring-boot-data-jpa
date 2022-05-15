@@ -2,15 +2,16 @@ package com.jmunoz.springboot.app.controllers;
 
 import com.jmunoz.springboot.app.models.entity.Cliente;
 import com.jmunoz.springboot.app.models.service.IClienteService;
+import com.jmunoz.springboot.app.util.paginator.PageRender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -24,10 +25,29 @@ public class ClienteController {
     @Autowired
     private IClienteService clienteService;
 
+    // Uso de paginación
+    // Se obtiene la página actual a través de la ruta URL (un @RequestParam)
+    // El defaultValue es importante que sea 0 para que la primera página empiece en 0
     @RequestMapping(value = "/listar", method = RequestMethod.GET)
-    public String listar(Model model) {
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+
+        // Hay 2 formas de crear un Pageable
+        // La forma antigua usando el operador new.
+        // Esta forma esta deprecated. Viene de la versión SpringBoot 1.5
+//        Pageable pageRequest = new PageRequest(page, 4);
+        // La forma nueva, desde SpringBoot 2, usa la creación estática sin el operador new, usando el método estático of
+        // Se le pasan dos enteros, indicando la página actual y el número de elementos a mostrar por página.
+        Pageable pageRequest = PageRequest.of(page, 4);
+
+        // Obtenemos la lista paginable
+        Page<Cliente> clientes = clienteService.findAll(pageRequest);
+        // Se la pasamos a la clase que calcula los elementos que se pasa a la vista
+        PageRender<Cliente> pageRender = new PageRender<>("/listar", clientes);
+
         model.addAttribute("titulo", "Listado de clientes");
-        model.addAttribute("clientes", clienteService.findAll());
+        model.addAttribute("clientes", clientes);
+        // Pasamos los elementos a la vista
+        model.addAttribute("page", pageRender);
 
         return "listar";
     }
