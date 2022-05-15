@@ -39,7 +39,7 @@ public class ClienteController {
         Cliente cliente = new Cliente();
 
         model.put("cliente", cliente);
-        model.put("titulo", "Formulario de Clientes");
+        model.put("titulo", "Formulario de Cliente");
         return "form";
     }
 
@@ -47,7 +47,7 @@ public class ClienteController {
     public String guardar(@Valid Cliente cliente, BindingResult result, Model model, SessionStatus status) {
 
         if (result.hasErrors()) {
-            model.addAttribute("titulo", "Formulario de Clientes");
+            model.addAttribute("titulo", "Formulario de Cliente");
             return "form";
         }
 
