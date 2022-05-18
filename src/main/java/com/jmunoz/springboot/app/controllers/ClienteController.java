@@ -80,22 +80,13 @@ public class ClienteController {
             return "form";
         }
 
-        // Si la foto no es vacía lo copiamos al directorio que lo queramos guardar, lo pasamos al objeto cliente
-        // En esta versión se guarda la foto en el proyecto.
-        // Más adelante se cambia esto para NO incluir la imagen en el proyecto y no tener que estar
-        // actualizando el directorio uploads para que actualice el deploy en el servidor embebido.
-        //
-        // Esto en IntelliJ se hace con Cmd+F9 y luego refresh en el navegador también.
-        // Pues lo que se hará será tener un directorio de imágenes, pero fuera del proyecto.
+        // NO se incluye la imagen en la carpeta uploads (se ha borrado) del proyecto
         // Se recomienda que un proyecto con Spring, WAR o JAR sea solamente de lectura. To-do lo que sea guardar
         // fotos, ficheros... debe desacoplarse y llevarse a un directorio externo que se configurará en el proyecto
         // como un recurso de acceso público.
+        // Para ver la configuración de esa carpeta ver la clase MvcConfig
         if (!foto.isEmpty()) {
-            // Indicamos el directorio donde se guardarán las imágenes
-            Path directorioRecursos = Paths.get("src//main//resources//static//uploads");
-            // Para poder concatenar el nombre del archivo y poder moverlo al directorio
-            String rootPath = directorioRecursos.toFile().getAbsolutePath();
-            // Escribimos en el directorio
+            String rootPath = "/Users/jmmm/Programacion/JAVA/Spring/Udemy-SpringFramework5YSpringBoot2_AndresJoseGuzman/00-Desarrollos/uploads/";
             try {
                 byte[] bytes = foto.getBytes();
                 Path rutaCompleta = Paths.get(rootPath + "//" + foto.getOriginalFilename());
