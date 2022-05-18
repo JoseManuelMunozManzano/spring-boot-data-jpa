@@ -21,7 +21,6 @@ public class Cliente implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // @NotEmpty se usa con String, para indicar que es requerido
     @NotEmpty
     private String nombre;
 
@@ -32,12 +31,13 @@ public class Cliente implements Serializable {
     @Email
     private String email;
 
-    // Y @NotNull con otro tipo de tipos de objetos
     @NotNull
     @Column(name = "create_at")
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createAt;
+
+    private String foto;
 
     public Long getId() {
         return id;
@@ -77,5 +77,13 @@ public class Cliente implements Serializable {
 
     public void setCreateAt(Date createAt) {
         this.createAt = createAt;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 }

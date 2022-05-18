@@ -10,16 +10,15 @@
         <div class="card-header" th:text="${titulo}"></div>
         <div class="card-body">
 
-            <!-- Este div es solo para pasar el cliente y acceder a sus mensajes, no es necesario imprimirlo -->
-            <!-- Para no imprimirlo en el html se usa, aunque es opcional, th:remove="tag" -->
-            <!-- Los ul y los li se usan para mostrar los campos de errores -->
             <div th:object="${cliente}" th:remove="tag">
                 <ul th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
                     <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
                 </ul>
             </div>
 
-            <form th:action="@{/form}" th:object="${cliente}" method="post">
+            <!-- enctype="multipart/form-data" sirve para indicar una codificación que sirve para el upload de archivos
+                como datos en el request en una petición HTTP -->
+            <form th:action="@{/form}" th:object="${cliente}" method="post" enctype="multipart/form-data">
                 <div class="form-group row">
                     <label class="col-form-label col-sm-2">Nombre</label>
                     <div class="col-sm-6">
