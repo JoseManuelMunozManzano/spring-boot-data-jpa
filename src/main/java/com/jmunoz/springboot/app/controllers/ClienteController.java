@@ -13,9 +13,14 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 @Controller
@@ -25,28 +30,16 @@ public class ClienteController {
     @Autowired
     private IClienteService clienteService;
 
-    // Uso de paginación
-    // Se obtiene la página actual a través de la ruta URL (un @RequestParam)
-    // El defaultValue es importante que sea 0 para que la primera página empiece en 0
     @RequestMapping(value = "/listar", method = RequestMethod.GET)
     public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 
-        // Hay 2 formas de crear un Pageable
-        // La forma antigua usando el operador new.
-        // Esta forma esta deprecated. Viene de la versión SpringBoot 1.5
-//        Pageable pageRequest = new PageRequest(page, 4);
-        // La forma nueva, desde SpringBoot 2, usa la creación estática sin el operador new, usando el método estático of
-        // Se le pasan dos enteros, indicando la página actual y el número de elementos a mostrar por página.
         Pageable pageRequest = PageRequest.of(page, 4);
 
-        // Obtenemos la lista paginable
         Page<Cliente> clientes = clienteService.findAll(pageRequest);
-        // Se la pasamos a la clase que calcula los elementos que se pasa a la vista
         PageRender<Cliente> pageRender = new PageRender<>("/listar", clientes);
 
         model.addAttribute("titulo", "Listado de clientes");
         model.addAttribute("clientes", clientes);
-        // Pasamos los elementos a la vista
         model.addAttribute("page", pageRender);
 
         return "listar";
@@ -61,13 +54,39 @@ public class ClienteController {
         return "form";
     }
 
-    // RedirectAttributes nos sirve para añadir los mensajes flash
+    // MultipartFile es el tipo que hay que indicar para pasar files
     @RequestMapping(value = "/form", method = RequestMethod.POST)
-    public String guardar(@Valid Cliente cliente, BindingResult result, Model model, RedirectAttributes flash, SessionStatus status) {
+    public String guardar(@Valid Cliente cliente, BindingResult result, Model model,
+                          @RequestParam("file") MultipartFile foto, RedirectAttributes flash, SessionStatus status) {
 
         if (result.hasErrors()) {
             model.addAttribute("titulo", "Formulario de Cliente");
             return "form";
+        }
+
+        // Si la foto no es vacía lo copiamos al directorio que lo queramos guardar, lo pasamos al objeto cliente
+        // En esta versión se guarda la foto en el proyecto.
+        // Más adelante se cambia esto para NO incluir la imagen en el proyecto y no tener que estar
+        // actualizando el directorio uploads para que actualice el deploy en el servidor embebido.
+        if (!foto.isEmpty()) {
+            // Indicamos el directorio donde se guardarán las imágenes
+            Path directorioRecursos = Paths.get("src//main//resources//static//uploads");
+            // Para poder concatenar el nombre del archivo y poder moverlo al directorio
+            String rootPath = directorioRecursos.toFile().getAbsolutePath();
+            // Escribimos en el directorio
+            try {
+                byte[] bytes = foto.getBytes();
+                Path rutaCompleta = Paths.get(rootPath + "//" + foto.getOriginalFilename());
+                Files.write(rutaCompleta, bytes);
+
+                flash.addFlashAttribute("info", "Has subido correctamente '" +
+                        foto.getOriginalFilename() + "'");
+
+                // Pasamos el nombre de la foto al entity Cliente para que quede guardado en la BBDD
+                cliente.setFoto(foto.getOriginalFilename());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         String mensajeFlash = (cliente.getId() != null) ? "Cliente editado con éxito!" : "Cliente creado con éxito!";
