@@ -30,6 +30,22 @@ public class ClienteController {
     @Autowired
     private IClienteService clienteService;
 
+    // Para ver la foto
+    @GetMapping(value="/ver/{id}")
+    public String ver(@PathVariable(value = "id") Long id, Model model, RedirectAttributes flash) {
+
+        Cliente cliente = clienteService.findOne(id);
+        if (cliente == null) {
+            flash.addFlashAttribute("error", "El cliente no existe en la base de datos");
+            return "redirect:/listar";
+        }
+
+        model.addAttribute("cliente", cliente);
+        model.addAttribute("titulo", "Detalle cliente: " + cliente.getNombre());
+
+        return "ver";
+    }
+
     @RequestMapping(value = "/listar", method = RequestMethod.GET)
     public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 
@@ -68,6 +84,12 @@ public class ClienteController {
         // En esta versión se guarda la foto en el proyecto.
         // Más adelante se cambia esto para NO incluir la imagen en el proyecto y no tener que estar
         // actualizando el directorio uploads para que actualice el deploy en el servidor embebido.
+        //
+        // Esto en IntelliJ se hace con Cmd+F9 y luego refresh en el navegador también.
+        // Pues lo que se hará será tener un directorio de imágenes, pero fuera del proyecto.
+        // Se recomienda que un proyecto con Spring, WAR o JAR sea solamente de lectura. To-do lo que sea guardar
+        // fotos, ficheros... debe desacoplarse y llevarse a un directorio externo que se configurará en el proyecto
+        // como un recurso de acceso público.
         if (!foto.isEmpty()) {
             // Indicamos el directorio donde se guardarán las imágenes
             Path directorioRecursos = Paths.get("src//main//resources//static//uploads");
