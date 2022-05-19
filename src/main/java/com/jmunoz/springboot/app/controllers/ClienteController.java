@@ -3,6 +3,8 @@ package com.jmunoz.springboot.app.controllers;
 import com.jmunoz.springboot.app.models.entity.Cliente;
 import com.jmunoz.springboot.app.models.service.IClienteService;
 import com.jmunoz.springboot.app.util.paginator.PageRender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.UUID;
 
 @Controller
 @SessionAttributes("cliente")
@@ -29,6 +32,8 @@ public class ClienteController {
 
     @Autowired
     private IClienteService clienteService;
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     // Para ver la foto
     @GetMapping(value="/ver/{id}")
@@ -80,23 +85,35 @@ public class ClienteController {
             return "form";
         }
 
-        // NO se incluye la imagen en la carpeta uploads (se ha borrado) del proyecto
-        // Se recomienda que un proyecto con Spring, WAR o JAR sea solamente de lectura. To-do lo que sea guardar
-        // fotos, ficheros... debe desacoplarse y llevarse a un directorio externo que se configurará en el proyecto
-        // como un recurso de acceso público.
+        // Se cambia directorio uploads externo al proyecto por un directorio absoluto y externo en la raiz
+        // del proyecto.
+        // Se ha creado el directorio uploads en la raiz del proyecto.
+        // Notar que cuando se haga el deploy no contiene imágenes. Estan dentro del proyecto de desarrollo,
+        // no de producción
         // Para ver la configuración de esa carpeta ver la clase MvcConfig
         if (!foto.isEmpty()) {
-            String rootPath = "/Users/jmmm/Programacion/JAVA/Spring/Udemy-SpringFramework5YSpringBoot2_AndresJoseGuzman/00-Desarrollos/uploads/";
+            // Generamos un nombre nuevo de fichero para evitar que se sobresescriba un fichero si ya existe
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + foto.getOriginalFilename();
+
+            // Con resolve se concatena de forma automática al uploads el nombre del archivo.
+            // Es un Path relativo al proyecto.
+            Path rootPath = Paths.get("uploads").resolve(uniqueFilename);
+            // Se concatena al path absoluto donde está el proyecto
+            Path rootAbsolutePath = rootPath.toAbsolutePath();
+
+            // Para hacer debug de los nombres de directorio
+            log.info("rootPath: " + rootPath);
+            log.info("rootAbsolutePath: " + rootAbsolutePath);
+
             try {
-                byte[] bytes = foto.getBytes();
-                Path rutaCompleta = Paths.get(rootPath + "//" + foto.getOriginalFilename());
-                Files.write(rutaCompleta, bytes);
+                // Otra forma de generar el archivo en la ruta, usando el stream de entrada y el path absoluto
+                Files.copy(foto.getInputStream(), rootAbsolutePath);
 
                 flash.addFlashAttribute("info", "Has subido correctamente '" +
-                        foto.getOriginalFilename() + "'");
+                        uniqueFilename + "'");
 
                 // Pasamos el nombre de la foto al entity Cliente para que quede guardado en la BBDD
-                cliente.setFoto(foto.getOriginalFilename());
+                cliente.setFoto(uniqueFilename);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
