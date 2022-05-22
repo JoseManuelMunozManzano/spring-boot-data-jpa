@@ -8,7 +8,10 @@
         <div class="card bg-light">
             <div class="card-header" th:text="${titulo}"></div>
             <div class="card-body">
-                <h4 class="card-title"></h4>
+                <h4 class="card-title">
+                    <a class="btn btn-light btn-xs" onclick="history.back()" th:text="'&laquo; volver'"></a>
+                    <!-- <a class="btn btn-light btn-xs" th:href="@{'/ver/' + ${factura.cliente.id}}" th:text="'&laquo; volver'"></a>-->
+                </h4>
 
                 <!-- Se va a ir a /factura/form cuando se guarde -->
                 <!-- Mapeado al objeto factura -->

@@ -8,6 +8,11 @@
     <div class="card bg-light">
         <div class="card-header" th:text="${titulo}"></div>
         <div class="card-body">
+
+            <h4 class="card-title">
+                <a class="btn btn-primary btn-xs" th:href="@{'/factura/form/' + ${cliente.id}}" th:text="'crear factura'"></a>
+            </h4>
+
             <!-- No hace falta indicar la carpeta static porque está incluido dentro de SpringBoot
                 como recurso para to-do el contenido web estático -->
             <!-- Se mide el largo del nombre de la foto. Si es cero no se visualiza porque no hay -->
