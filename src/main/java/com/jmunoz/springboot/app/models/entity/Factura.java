@@ -38,7 +38,10 @@ public class Factura implements Serializable {
     // IMPORTANTÍSIMO
     // Con @JoinColumn, como la relación es unidireccional, se indica cuál es la llave foránea.
     // Por tanto, en la tabla facturas_items vamos a tener un campo llamado factura_id
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //
+    // Se añade orphanRemoval a true que es opcional y sirve para eliminar registros huérfanos que no están
+    // asociados a ningún cliente
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "factura_id")
     private List<ItemFactura> items;
 

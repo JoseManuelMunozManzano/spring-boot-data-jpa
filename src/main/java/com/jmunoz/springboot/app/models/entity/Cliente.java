@@ -51,7 +51,10 @@ public class Cliente implements Serializable {
     // Con mappedBy se hace bidireccional. Se indica que cliente va a tener una lista de facturas y factura va a
     // tener un cliente. El nombre es el que aparece en la clase Factura. De forma automática se crea la clave
     // foránea cliente_id en la tabla facturas para relacionar ambas tablas.
-    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //
+    // Se añade orphanRemoval a true que es opcional y sirve para eliminar registros huérfanos que no están
+    // asociados a ningún cliente
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Factura> facturas;
 
     private String foto;
