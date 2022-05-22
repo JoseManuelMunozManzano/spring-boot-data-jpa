@@ -4,7 +4,6 @@ import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 
-// TODO: Añadir el producto
 // No tiene relación con factura porque para este proyecto no la necesita. En ningún momento vamos a utilizar
 // un ItemFactura para obtener la factura
 // Relación unidireccional de Factura con ItemFactura
@@ -17,6 +16,16 @@ public class ItemFactura implements Serializable {
     private Long id;
 
     private Integer cantidad;
+
+    // Muchos itemFactura, un producto (podría se también @OneToOne, pero lo importante es el ToOne, la relación
+    // por el lado del ItemFactura)
+    //
+    // Por defecto, ya que estamos mapeando producto, va a crear el atributo producto_id en la tabla facturas_items
+    // de forma automática, pero igual se puede especificar de forma explícita con @JoinColumn
+    // Así relacionamos la tabla facturas_items con la tabla productos.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "producto_id")
+    private Producto producto;
 
     public Long getId() {
         return id;
@@ -34,8 +43,8 @@ public class ItemFactura implements Serializable {
         this.cantidad = cantidad;
     }
 
-    public Long calcularImporte() {
-        return cantidad.longValue();
+    public Double calcularImporte() {
+        return cantidad.doubleValue() * producto.getPrecio();
     }
 
     @Serial
