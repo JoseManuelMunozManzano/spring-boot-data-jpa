@@ -109,7 +109,7 @@ public class Factura implements Serializable {
         this.items.add(item);
     }
 
-    public Double getTottal() {
+    public Double getTotal() {
         Double total = 0.0;
 
         for (ItemFactura item : items) {
