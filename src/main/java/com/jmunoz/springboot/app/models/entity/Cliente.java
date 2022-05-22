@@ -8,7 +8,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "clientes")
@@ -37,7 +39,26 @@ public class Cliente implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createAt;
 
+    // Un cliente puede tener muchas facturas
+    //
+    // Aquí indicar LAZY es todavía más importante para evitar que se traiga todas las facturas de cada cliente (EAGER)
+    //
+    // CascadeType.ALL indica que todas las operaciones delete y persist se van a realizar en cadena. Por ejemplo,
+    // cuando al Cliente se le asignen varias facturas y el cliente se persiste con el método persist, automáticamente
+    // va a persistir también a sus elementos hijos (facturas)
+    // O si el cliente se elimina, también se van a eliminar automáticamente todas sus facturas.
+    //
+    // Con mappedBy se hace bidireccional. Se indica que cliente va a tener una lista de facturas y factura va a
+    // tener un cliente. El nombre es el que aparece en la clase Factura. De forma automática se crea la clave
+    // foránea cliente_id en la tabla facturas para relacionar ambas tablas.
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Factura> facturas;
+
     private String foto;
+
+    public Cliente() {
+        facturas = new ArrayList<>();
+    }
 
     public Long getId() {
         return id;
@@ -85,5 +106,17 @@ public class Cliente implements Serializable {
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    public List<Factura> getFacturas() {
+        return facturas;
+    }
+
+    public void setFacturas(List<Factura> facturas) {
+        this.facturas = facturas;
+    }
+
+    public void addFactura(Factura factura) {
+        facturas.add(factura);
     }
 }
