@@ -18,25 +18,34 @@
                 <form th:action="@{/factura/form/}" th:object="${factura}" method="post">
 
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label" th:text="'Cliente'"></label>
+                        <label for="cliente" class="col-sm-2 col-form-label" th:text="'Cliente'"></label>
                         <div class="col-sm-6">
                             <!-- No se guarda en BBDD, solo para mostrar -->
-                            <input th:value="${factura.cliente.nombre} + ' ' +  ${factura.cliente.apellido}"
+                            <input id="cliente" th:value="${factura.cliente.nombre} + ' ' +  ${factura.cliente.apellido}"
                                    class="form-control" disabled />
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label" th:text="'Descripción'"></label>
+                        <label for="descripcion" class="col-sm-2 col-form-label" th:text="'Descripción'"></label>
                         <div class="col-sm-6">
-                            <input type="text" th:field="*{descripcion}" class="form-control" />
+                            <input id="descripcion" type="text" th:field="*{descripcion}" class="form-control" />
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label" th:text="'Observación'"></label>
+                        <label for="observacion" class="col-sm-2 col-form-label" th:text="'Observación'"></label>
                         <div class="col-sm-6">
-                            <textarea th:field="*{observacion}" class="form-control"></textarea>
+                            <textarea id="observacion" th:field="*{observacion}" class="form-control"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Autocomplete -->
+                    <!-- Se quita el th:field porque no está mapeado al objeto entity, no es parte de un atributo -->
+                    <div class="form-group row">
+                        <label for="buscar_producto" class="col-sm-2 col-form-label" th:text="'Buscar producto'"></label>
+                        <div class="col-sm-6">
+                            <input type="text" name="buscar_producto" id="buscar_producto" class="form-control"></input>
                         </div>
                     </div>
 
@@ -52,5 +61,6 @@
     </div>
 
     <footer th:replace="layout/layout :: footer"></footer>
+    <script th:replace="factura/js/autocomplete-productos :: javascript"></script>
 </body>
 </html>
