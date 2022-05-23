@@ -2,15 +2,14 @@ package com.jmunoz.springboot.app.controllers;
 
 import com.jmunoz.springboot.app.models.entity.Cliente;
 import com.jmunoz.springboot.app.models.entity.Factura;
+import com.jmunoz.springboot.app.models.entity.Producto;
 import com.jmunoz.springboot.app.models.service.IClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -21,7 +20,6 @@ public class FacturaController {
     @Autowired
     private IClienteService clienteService;
 
-    // Método para desplegar el formulario en la vista
     @GetMapping("/form/{clienteId}")
     public String crear(@PathVariable(value = "clienteId") Long clienteId,
                         Map<String, Object> model,
@@ -33,15 +31,6 @@ public class FacturaController {
             return "redirect:/listar";
         }
 
-        // Se crea la factura y se relaciona con el cliente
-        // Es muy importante mantener el objeto factura en una session hasta que se procesa el formulario y se envía
-        // al método guardar que persiste la factura en la BBDD junto con el cliente y sus items.
-        //
-        // Ver en ClienteController, en el método guardar como existe el parámetro SessionStatus y cuando se graba
-        // el cliente se hace un status.setComplete() y se elimina de la sesión.
-        // Aquí se hará igual.
-        //
-        // Por eso se indica el @SessionAttributes con este nombre factura en la cabecera de la clase
         Factura factura = new Factura();
         factura.setCliente(cliente);
 
@@ -49,5 +38,16 @@ public class FacturaController {
         model.put("titulo", "Crear Factura");
 
         return "factura/form";
+    }
+
+    // Autocomplete
+    // En resources/templates/factura/js/autocomplete-productos.html se indica
+    // url: "/factura/cargar-productos/" + request.term,
+    //
+    // @ResponseBody suprime la carga de una vista Thymeleaf y en vez de eso va a tomar el resultado
+    // convertido a JSON y lo va a registrar dentro del body de la respuesta
+    @GetMapping(value = "/cargar-productos/{term}", produces = {"application/json"})
+    public @ResponseBody List<Producto> cargarProductos(@PathVariable String term) {
+        return clienteService.findByNombre(term);
     }
 }
