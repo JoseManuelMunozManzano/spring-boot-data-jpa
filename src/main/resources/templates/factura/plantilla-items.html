@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <!-- Este html es una plantilla para poder crear los items de la factura de forma dinámica con JQuery -->
+
+    <!-- La clase d-none es para evitar que se muestre, será invisible. Con JavaScript se leerá la plantilla
+        y se reemplazarán los valores-->
+    <table th:fragment="itemsFactura" class="d-none">
+        <tbody id="plantillaItemsFactura">
+            <!-- Este ID, NOMBRE y PRECIO después se reemplazarán por código -->
+            <tr id="row_{ID}">
+                <!-- item_id[] va con corchete porque es un arreglo. Una factura puede tener varias líneas -->
+                <td class="d-none"><input type="hidden" value="{ID}" name="item_id[]" /></td>
+                <td>{NOMBRE}</td>
+                <td>{PRECIO}</td>
+                <td><input type="number" value="1" name="cantidad[]"
+                           id="cantidad_{ID}" class="form-control col-sm-4" /></td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
