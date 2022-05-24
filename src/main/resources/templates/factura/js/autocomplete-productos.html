@@ -31,7 +31,17 @@
 
                 <!-- Selecciona un valor para realizar alguna tarea  -->
                 select: function(event, ui) {
-                    $("#buscar_producto").val(ui.item.label);
+
+                    <!-- Obtenemos el contenido html de la plantilla plantilla-items.html -->
+                    var linea = $("#plantillaItemsFactura").html();
+
+                    <!-- Cambiamos los parámetros por el valor -->
+                    linea = linea.replace(/{ID}/g, ui.item.value);
+                    linea = linea.replace(/{NOMBRE}/g, ui.item.label);
+                    linea = linea.replace(/{PRECIO}/g, ui.item.precio);
+
+                    <!-- Agregamos la linea al tbody de la tabla de form.html -->
+                    $("#cargarItemProductos tbody").append(linea);
 
                     return false;
                 }

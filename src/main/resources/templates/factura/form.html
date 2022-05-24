@@ -51,6 +51,20 @@
 
                     <!-- Se añade la plantilla plantilla_items -->
                     <table th:replace="factura/plantilla-items :: itemsFactura"></table>
+                    <!-- Tabla html, que es la tabla principal de la factura y va a contener todas las líneas y
+                        cada fila se va a crear de forma dinámica con JQuery cuando se selecciona un producto
+                        del autocomplete -->
+                    <table id="cargarItemProductos" class="table table-sm table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
 
                     <div class="form-group row">
                         <div class="col-sm-6">
