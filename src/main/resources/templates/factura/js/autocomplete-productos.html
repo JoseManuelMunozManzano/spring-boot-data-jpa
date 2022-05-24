@@ -32,6 +32,11 @@
                 <!-- Selecciona un valor para realizar alguna tarea  -->
                 select: function(event, ui) {
 
+                    if (itemsHelper.hasProducto(ui.item.value)) {
+                        itemsHelper.incrementaCantidad(ui.item.value, ui.item.precio);
+                        return false;
+                    }
+
                     <!-- Obtenemos el contenido html de la plantilla plantilla-items.html -->
                     var linea = $("#plantillaItemsFactura").html();
 
@@ -53,6 +58,23 @@
         var itemsHelper = {
             calcularImporte: function(id, precio, cantidad) {
                 $("#total_importe_" + id).html(parseInt(precio) * parseInt(cantidad));
+            },
+
+            hasProducto: function(id) {
+                var resultado = false;
+                $('input[name="item_id[]"]').each(function() {
+                    if(parseInt(id) == parseInt($(this).val())) {
+                        resultado = true;
+                    }
+                });
+
+                return resultado;
+            },
+
+            incrementaCantidad: function(id, precio) {
+                var cantidad = $("#cantidad_" + id).val() ? parseInt($("#cantidad_" + id).val()) : 0;
+                $("#cantidad_" + id).val(++cantidad);
+                this.calcularImporte(id, precio, cantidad);
             }
         }
 
