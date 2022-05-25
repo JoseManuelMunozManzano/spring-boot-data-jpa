@@ -29,7 +29,11 @@
                     <div class="form-group row">
                         <label for="descripcion" class="col-sm-2 col-form-label" th:text="'Descripción'"></label>
                         <div class="col-sm-6">
-                            <input id="descripcion" type="text" th:field="*{descripcion}" class="form-control" />
+                            <input id="descripcion" type="text" th:field="*{descripcion}" class="form-control"
+                                   th:errorclass="'form-control is-invalid'" />
+                            <!-- El mensaje de error -->
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('descripcion')}"
+                                 th:errors="*{descripcion}"></div>
                         </div>
                     </div>
 

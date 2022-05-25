@@ -1,6 +1,7 @@
 package com.jmunoz.springboot.app.models.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class Factura implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty
     private String descripcion;
 
     private String observacion;
@@ -23,24 +25,9 @@ public class Factura implements Serializable {
     @Column(name = "create_at")
     private Date createAt;
 
-    // Muchas facturas, un cliente
-    //
-    // La carga es perezosa, a medida que se van invocando los métodos. Es decir, cuando se hace un getCliente()
-    // entonces ahí se hace la consulta del cliente de la factura
-    // EAGER trae to-do de una vez
     @ManyToOne(fetch = FetchType.LAZY)
     private Cliente cliente;
 
-    // Para obtener todas las líneas de la factura dada su factura
-    //
-    // Una factura puede tener muchas líneas de factura
-    //
-    // IMPORTANTÍSIMO
-    // Con @JoinColumn, como la relación es unidireccional, se indica cuál es la llave foránea.
-    // Por tanto, en la tabla facturas_items vamos a tener un campo llamado factura_id
-    //
-    // Se añade orphanRemoval a true que es opcional y sirve para eliminar registros huérfanos que no están
-    // asociados a ningún cliente
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "factura_id")
     private List<ItemFactura> items;
@@ -49,9 +36,6 @@ public class Factura implements Serializable {
         this.items = new ArrayList<>();
     }
 
-    // La fecha de creación se va a manejar de forma automática
-    // Con esto no es necesario tener la fecha en el formulario, ya que es una fecha interna
-    // Justo antes de persistir la factura le asigna la fecha
     @PrePersist
     public void prePersist() {
         createAt = new Date();
