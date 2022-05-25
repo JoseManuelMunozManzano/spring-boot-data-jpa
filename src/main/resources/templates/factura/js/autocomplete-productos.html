@@ -52,6 +52,14 @@
                     return false;
                 }
             });
+
+            <!-- Eliminar el tbody de plantilla-items.html antes de realizar el submit, ya que no queremos -->
+            <!-- que se tome el input de la plantilla y se trate como si fuese una línea más -->
+             $("form").submit(function() {
+                $("#plantillaItemsFactura").remove();
+                return;
+             });
+
            }
         );
 
