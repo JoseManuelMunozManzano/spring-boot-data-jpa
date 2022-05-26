@@ -70,15 +70,6 @@ public class FacturaController {
         return clienteService.findByNombre(term);
     }
 
-    // Guardar facturas con sus líneas en BD
-    // Los nombres de los parámetros que se reciben vienen de plantilla-items.html, pero notar que estos datos
-    // de plantilla se eliminan en autocomplete-productos.html para que no coja esa línea e intente grabarla,
-    // aunque daría error porque el value de item_id[] debe ser un número y en ese caso es ID.
-    //
-    // Factura es el objeto del formulario que se inyecta de forma automática al método. Contiene todos los
-    // datos del formulario excepto las líneas que se manejan aparte a través de un input, ya que no están
-    // directamente mapeadas a campos de la clase Factura.
-    // Por tanto, pasamos los items de la factura a la factura y la guardamos.
     @PostMapping("/form")
     public String guardar(@Valid Factura factura,
                           BindingResult result,
@@ -113,11 +104,25 @@ public class FacturaController {
 
         clienteService.saveFactura(factura);
 
-        // Eliminamos la factura de la sesión
         status.setComplete();
 
         flash.addFlashAttribute("success", "Factura creada con éxito");
 
         return "redirect:/ver/" + factura.getCliente().getId();
+    }
+
+    @GetMapping("/eliminar/{id}")
+    public String eliminar(@PathVariable(value = "id") Long id, RedirectAttributes flash) {
+        Factura factura = clienteService.findFacturaById(id);
+
+        if (factura != null) {
+            clienteService.deleteFactura(id);
+            flash.addFlashAttribute("success", "Factura eliminada con éxito!");
+            return "redirect:/ver/" + factura.getCliente().getId();
+        }
+
+        flash.addFlashAttribute("error", "La factura no existe en la base de datos, no se pudo eliminar!");
+
+        return "redirect:/listar";
     }
 }
