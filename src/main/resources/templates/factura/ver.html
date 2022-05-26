@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/layout :: head"></head>
+<body>
+<header th:replace="layout/layout :: header"></header>
+
+<div class="container py-4">
+
+    <div class="card bg-light">
+        <div class="card-header" th:text="${titulo}"></div>
+        <div class="card-body">
+
+            <h4 class="card-title">
+                <a onclick="history.back()" class="btn btn-light btx-xs">&laquo; volver</a>
+            </h4>
+
+            <!-- Datos del cliente -->
+            <ul class="list-group my-2">
+                <li class="list-group-item list-group-item-primary" th:text="'Datos del cliente'"></li>
+                <!-- factura.cliente escribe el método .toString() que se ha añadido al Entity Cliente -->
+                <li class="list-group-item" th:text="${factura.cliente}"></li>
+                <li class="list-group-item" th:text="${factura.cliente.email}"></li>
+            </ul>
+
+            <!-- Datos de factura -->
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-success" th:text="'Datos de la factura'"></li>
+                <li class="list-group-item" th:text="'Folio: ' + ${factura.id}"></li>
+                <li class="list-group-item" th:text="'Descripción: ' + ${factura.descripcion}"></li>
+                <li class="list-group-item" th:text="'Fecha: ' + ${factura.createAt}"></li>
+            </ul>
+
+        </div>
+    </div>
+
+    <footer th:replace="layout/layout :: footer"></footer>
+</div>
+</body>
+</html>
