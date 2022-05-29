@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
@@ -55,5 +56,28 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         builder.inMemoryAuthentication()
                 .withUser(users.username("admin").password("1234").roles("ADMIN", "USER"))
                 .withUser(users.username("jmunoz").password("1234").roles("USER"));
+    }
+
+    // CONFIGURACION AUTORIZACIONES HTTP, para dar seguridad a todas nuestras páginas
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        // Aquí asignamos nuestras rutas
+        // Primero vamos a poner las rutas públicas a usuarios registrados y anónimos. Se usa permitAll()
+        // Y luego ponemos las rutas privadas, las que queremos proteger. En este caso se indica el rol también
+        // y se termina con anyRequest().authenticated()
+        //
+        // Cuando configuramos nuestras rutas y damos autorización, por detrás Spring Security ejecuta un
+        // interceptor antes de cargar cualquier ruta de nuestros controladores y evalúa que nuestro usuario tenga
+        // permiso. Si no tiene permiso mostrará una página de error indicando acceso denegado.
+        // Si tenemos configurado nuestra página de login, en vez de mostrar la página acceso denegado, va a
+        // redirigir a la página de login.
+        // Por defecto, la ruta, el @RequestMapping es login
+        http.authorizeRequests().antMatchers("/", "/css/**", "/js/**", "/images/**", "/listar").permitAll()
+                .antMatchers("/ver/**").hasAnyRole("USER")
+                .antMatchers("/uploads/**").hasAnyRole("USER")
+                .antMatchers("/form/**").hasAnyRole("ADMIN")
+                .antMatchers("/eliminar/**").hasAnyRole("ADMIN")
+                .antMatchers("/factura/**").hasAnyRole("ADMIN")
+                .anyRequest().authenticated();
     }
 }

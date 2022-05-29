@@ -35,7 +35,6 @@ public class ClienteController {
     private IUploadFileService uploadFileService;
 
 
-    // Para ver la foto
     @GetMapping(value = "/ver/{id}")
     public String ver(@PathVariable(value = "id") Long id, Model model, RedirectAttributes flash) {
 
@@ -51,7 +50,8 @@ public class ClienteController {
         return "ver";
     }
 
-    @RequestMapping(value = "/listar", method = RequestMethod.GET)
+    // Como listar en nuestra única página pública, la ponemos también como página de inicio
+    @RequestMapping(value = {"/listar", "/"}, method = RequestMethod.GET)
     public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 
         Pageable pageRequest = PageRequest.of(page, 4);
