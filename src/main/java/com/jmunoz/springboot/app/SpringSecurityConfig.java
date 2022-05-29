@@ -78,6 +78,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/form/**").hasAnyRole("ADMIN")
                 .antMatchers("/eliminar/**").hasAnyRole("ADMIN")
                 .antMatchers("/factura/**").hasAnyRole("ADMIN")
-                .anyRequest().authenticated();
+                .anyRequest().authenticated()
+                // Aquí empieza la configuración del formulario de login. Está permitida para to-do tipo de usuarios.
+                .and()
+                .formLogin().permitAll()
+                .and()
+                // E igual para la página logout, también para to-do tipo de usuarios.
+                .logout().permitAll();
     }
 }
