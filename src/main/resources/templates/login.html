@@ -27,6 +27,15 @@
         </div>
     </div>
 
+    <!-- Spring Security maneja la protección CSRF (cross site request forgering) que sería la falsificación de -->
+    <!-- peticiones en sitios cruzados, de forma automática en todos los formularios de nuestra aplicación -->
+    <!-- que envían una petición post. -->
+    <!-- Si vemos el código fuente de un formulario, se puede ver: -->
+    <!-- <input type="hidden" name="_csrf" value="49f98a8e-07d2-4829-9ea6-977ab7720358"/> -->
+    <!-- Por lo tanto, no habría que hacer nada, pero si queremos incluirlo de forma manual se puede hacer -->
+    <!-- NOTA: Lo voy a dejar, pero no hace falta, de hecho ahora aparecerá dos veces en el código fuente -->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
     <footer th:replace="layout/layout :: footer"></footer>
 </body>
 </html>
