@@ -92,6 +92,13 @@ public class ClienteController {
             logger.info("Forma usando SecurityContextHolderAwareRequestWrapper. Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
         }
 
+        // Otra forma de validar el role usando solo el request de forma nativa
+        if (request.isUserInRole("ROLE_ADMIN")) {
+            logger.info("Forma usando HttpServletRequest. Hola ".concat(auth.getName()).concat(" tienes acceso!"));
+        } else {
+            logger.info("Forma usando HttpServletRequest. Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
+        }
+
         Pageable pageRequest = PageRequest.of(page, 4);
 
         Page<Cliente> clientes = clienteService.findAll(pageRequest);
