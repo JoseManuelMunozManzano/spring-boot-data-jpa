@@ -14,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +29,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Map;
 
 @Controller
@@ -68,6 +72,12 @@ public class ClienteController {
         // pasarlo a la vista, o en nuestro caso, ponerlo en un log
         if (auth != null) {
             logger.info("Hola usuario autenticado, tu username es: ".concat(auth.getName()));
+        }
+
+        if (hasRole("ROLE_ADMIN")) {
+            logger.info("Hola ".concat(auth.getName()).concat(" tienes acceso!"));
+        } else {
+            logger.info("Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
         }
 
         Pageable pageRequest = PageRequest.of(page, 4);
@@ -180,5 +190,42 @@ public class ClienteController {
         }
 
         return "redirect:/listar";
+    }
+
+    // Obtener el role programáticamente y ver si cumple o no dicho role
+    // NOTA: Por defecto SpringBoot maneja los roles con la clase SimpleGrantedAuthority que implementa la interface
+    //       GrantedAuthority.
+    // Podríamos crear nuestra propia clase role, heredando de SimpleGrantedAuthority o implementando GrantedAuthority
+    private boolean hasRole(String role) {
+        SecurityContext context = SecurityContextHolder.getContext();
+        // No tiene acceso
+        if (context == null) {
+            return false;
+        }
+
+        Authentication auth = context.getAuthentication();
+        // No tiene acceso
+        if (auth == null) {
+            return false;
+        }
+
+        // Cualquier clase Role o que representa un Role en nuestra app tiene que implementar esta interface.
+        // Nos vale cualquier objeto que implemente la interface GrantedAuthority.
+        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+
+        // Usando un for
+        // La ventaja es que nos permite usar el logger
+//        for (GrantedAuthority authority : authorities) {
+//            if (role.equals(authority.getAuthority())) {
+//                logger.info("Hola usuario ".concat(auth.getName()).concat(" tu role es ").concat(authority.getAuthority()));
+//                return true;
+//            }
+//        }
+
+//        return false;
+
+        // Otra forma de validar buscando si contiene el role
+        return authorities.contains(new SimpleGrantedAuthority(role));
+
     }
 }
