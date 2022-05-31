@@ -18,6 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -60,16 +62,10 @@ public class ClienteController {
         return "ver";
     }
 
-    // Segunda forma de obtener el usuario autenticado
-    // De forma estática, permitiendo obtener el authentication en cualquier clase de nuestra aplicación
     @RequestMapping(value = {"/listar", "/"}, method = RequestMethod.GET)
-    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model, HttpServletRequest request) {
 
-        // Obteniendo authentication de forma estática
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        // Fundamental validar
-        // Aquí se puede hacer ya cualquier cosa, como ir a hacer una consulta usando el usuario autenticado, o
-        // pasarlo a la vista, o en nuestro caso, ponerlo en un log
         if (auth != null) {
             logger.info("Hola usuario autenticado, tu username es: ".concat(auth.getName()));
         }
@@ -78,6 +74,22 @@ public class ClienteController {
             logger.info("Hola ".concat(auth.getName()).concat(" tienes acceso!"));
         } else {
             logger.info("Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
+        }
+
+        // Otra forma más simple de chequear la autorización del role en nuestras clases controladoras
+        // Esta clase de Spring Security envuelve el objeto HttpServletRequest (añadido como parámetro al método)
+        // y nos permite validar el role.
+        // Si revisamos la clase SecurityContextHolderAwareRequestWrapper y buscamos el método isUserInRole que
+        // invoca el método isGranted, y revisamos este método, veremos que se implementa algo muy parecido a
+        // nuestro método hasRole de abajo
+        //
+        // Se indica el prefijo y por eso en la segunda línea se indica solo ADMIN.
+        // Si el prefijo fuera blancos, entonces en la segunda línea se indicaria ROLE_ADMIN
+        SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
+        if (securityContext.isUserInRole("ADMIN")) {
+            logger.info("Forma usando SecurityContextHolderAwareRequestWrapper. Hola ".concat(auth.getName()).concat(" tienes acceso!"));
+        } else {
+            logger.info("Forma usando SecurityContextHolderAwareRequestWrapper. Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
         }
 
         Pageable pageRequest = PageRequest.of(page, 4);
