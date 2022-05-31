@@ -44,6 +44,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().loginPage("/login")
                 .permitAll()
                 .and()
-                .logout().permitAll();
+                .logout().permitAll()
+                // Configurando nuestra página de error (Ver también MvcConfig)
+                // Se añade la misma ruta que se puso en addViewController
+                .and()
+                .exceptionHandling().accessDeniedPage("/error_403");
     }
 }
