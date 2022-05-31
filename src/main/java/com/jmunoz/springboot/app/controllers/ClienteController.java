@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -47,7 +48,12 @@ public class ClienteController {
     @Autowired
     private IUploadFileService uploadFileService;
 
-    @Secured("ROLE_USER")
+    // Usando la anotación @PreAuthorize
+    // Hace uso del método hasRole y se le pasa el role.
+    // Si hay más de un role se puede usar el método hasAnyRole y se informan los roles separados por comas.
+    // Hay más métodos que se pueden ver en la página de SpringSecurity:
+    // https://docs.spring.io/spring-security/reference/index.html
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping(value = "/ver/{id}")
     public String ver(@PathVariable(value = "id") Long id, Model model, RedirectAttributes flash) {
 
@@ -123,7 +129,8 @@ public class ClienteController {
     }
 
     // Dando seguridad al role USER usando anotaciones
-    @Secured("ROLE_USER")
+    // Si hay más de un role, con @Secured se ponen usando las llaves y separados los roles por comas
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping(value = "/uploads/{filename:.+}")
     public ResponseEntity<Resource> verFoto(@PathVariable String filename) {
 
@@ -179,7 +186,7 @@ public class ClienteController {
         return "redirect:listar";
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/form/{id}")
     public String editar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
         Cliente cliente = null;

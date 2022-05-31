@@ -15,8 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 // Muy importante la anotación @EnableGlobalMethodSecurity para permitir dar seguridad a rutas usando anotaciones
 // en los controladores.
+// Para poder dar seguridad usando la anotación @PreAuthorize hay que habilitar prePostEnabled
 
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
