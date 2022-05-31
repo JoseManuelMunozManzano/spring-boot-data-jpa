@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -55,16 +56,18 @@ public class ClienteController {
         return "ver";
     }
 
-    // Primera forma de obtener el usuario autenticado
-    // Por argumento obtenemos el usuario autenticado usando Authentication al método handler inyectándolo
+    // Segunda forma de obtener el usuario autenticado
+    // De forma estática, permitiendo obtener el authentication en cualquier clase de nuestra aplicación
     @RequestMapping(value = {"/listar", "/"}, method = RequestMethod.GET)
-    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model, Authentication authentication) {
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 
+        // Obteniendo authentication de forma estática
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         // Fundamental validar
         // Aquí se puede hacer ya cualquier cosa, como ir a hacer una consulta usando el usuario autenticado, o
         // pasarlo a la vista, o en nuestro caso, ponerlo en un log
-        if (authentication != null) {
-            logger.info("Hola usuario autenticado, tu username es: ".concat(authentication.getName()));
+        if (auth != null) {
+            logger.info("Hola usuario autenticado, tu username es: ".concat(auth.getName()));
         }
 
         Pageable pageRequest = PageRequest.of(page, 4);
