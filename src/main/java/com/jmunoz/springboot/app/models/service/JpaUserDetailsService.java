@@ -45,10 +45,11 @@ public class JpaUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Username " + username + " no existe en el sistema!");
         }
 
-        // Obtenemos los roles y los registramos en una lista GrantedAuthority
+        // Obtenemos los roles (era carga LAZY) y los registramos en una lista GrantedAuthority
         // GrantedAuthority es el tipo abstracto y la implementa SimpleGrantedAuthority
         List<GrantedAuthority> authorities = new ArrayList<>();
         for (Role role: usuario.getRoles()) {
+            logger.info("Role: ".concat(role.getAuthority()));
             authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
         }
 
