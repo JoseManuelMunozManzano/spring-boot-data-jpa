@@ -2,7 +2,6 @@ package com.jmunoz.springboot.app;
 
 import com.jmunoz.springboot.app.auth.handler.LoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -13,10 +12,6 @@ import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-// Muy importante la anotación @EnableGlobalMethodSecurity para permitir dar seguridad a rutas usando anotaciones
-// en los controladores.
-// Para poder dar seguridad usando la anotación @PreAuthorize hay que habilitar prePostEnabled
-
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -24,14 +19,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private LoginSuccessHandler successHandler;
 
-    @Bean
-    public static BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    // Y aquí le hacemos el @Autowired para poder usarlo
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     public void configurerGlobal(AuthenticationManagerBuilder builder) throws Exception {
-        PasswordEncoder encoder = passwordEncoder();
+        PasswordEncoder encoder = passwordEncoder;
 
         UserBuilder users = User.builder().passwordEncoder(encoder::encode);
 
@@ -40,31 +34,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser(users.username("jmunoz").password("1234").roles("USER"));
     }
 
-    // En vez de dar seguridad a las rutas http de forma programática, se pueden usar anotaciones en el controlador.
-    // Para hacer el ejemplo, se deja de dar seguridad programática a las rutas /ver, /uploads, /form, /eliminar
-    // y /factura (y sus subrutas) y se va a dar esa seguridad en los controladores usando anotaciones.
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().antMatchers("/", "/css/**", "/js/**", "/images/**", "/listar").permitAll()
-//                .antMatchers("/ver/**").hasAnyRole("USER")
-//                .antMatchers("/uploads/**").hasAnyRole("USER")
-//                .antMatchers("/form/**").hasAnyRole("ADMIN")
-//                .antMatchers("/eliminar/**").hasAnyRole("ADMIN")
-//                .antMatchers("/factura/**").hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
-                    // Se habilita la página de login personalizada
                     .formLogin()
-                        // Se configura el successHandler del formulario login (ver en paquete auth.handler la clase
-                        // LoginSuccessHandler)
                         .successHandler(successHandler)
-                        // Se pone la ruta del GetMapping del controlador
                         .loginPage("/login")
                     .permitAll()
                 .and()
                 .logout().permitAll()
-                // Configurando nuestra página de error (Ver también MvcConfig)
-                // Se añade la misma ruta que se puso en addViewController
                 .and()
                 .exceptionHandling().accessDeniedPage("/error_403");
     }
