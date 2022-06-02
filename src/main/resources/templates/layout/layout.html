@@ -45,13 +45,11 @@
                 <ul class="navbar-nav navbar-right mx-4">
                     <!-- El parámetro lang es el mismo que aparece en la configuración MvcConfig, en el interceptor -->
                     <!-- Lo que se hace es concatenar a la url actual el parámetro ?lang=es_ES -->
-                    <!-- Esto tiene un problema. Cuando, en la vista listar, seleccionamos otra página, la url
-                        queda con el paginador así: http://localhost:8080/listar?page=2
-                        Si ahora pulsamos en un link de idioma, la url cambia a: http://localhost:8080/listar?lang=en_US
-                        Es decir, no ha mantenido la url anterior con el paginador. Esto se mejorará. -->
-                    <li class="nav-item mx-1"><a class="btn btn-outline-success" href="?lang=es_ES">ES</a></li>
-                    <li class="nav-item mx-1"><a class="btn btn-outline-success" href="?lang=en_US">EN</a></li>
-                    <li class="nav-item mx-1"><a class="btn btn-outline-success" href="?lang=de_DE">DE</a></li>
+                    <!-- Se ha creado un controlador (LocaleController) que redirecciona a la última URL en la
+                        que estábamos -->
+                    <li class="nav-item mx-1"><a class="btn btn-outline-success" th:href="@{/locale(lang=es_ES)}">ES</a></li>
+                    <li class="nav-item mx-1"><a class="btn btn-outline-success" th:href="@{/locale(lang=en_US)}">EN</a></li>
+                    <li class="nav-item mx-1"><a class="btn btn-outline-success" th:href="@{/locale(lang=de_DE)}">DE</a></li>
                 </ul>
             </div>
         </nav>
