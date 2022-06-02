@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- Se añade el namespace de seguridad Thymeleaf -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="layout/layout :: head">
 
@@ -14,19 +13,19 @@
         <div class="card-body">
 
             <h4 class="card-title">
-                <!-- Solo los roles ADMIN pueden crear clientes, crear facturas, editar cliente y eliminarlo -->
                 <a sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-primary btn-xs" th:href="@{/form}">Crear Cliente</a>
             </h4>
 
             <table class="table table-striped table-bordered">
                 <thead class="thead-inverse">
                 <tr>
-                    <!-- El rol USER puede acceder al detalle del cliente -->
                     <th sec:authorize="hasRole('ROLE_USER')">id</th>
-                    <th>nombre</th>
-                    <th>apellido</th>
-                    <th>email</th>
-                    <th>fecha</th>
+                    <!-- Se usan los ficheros properties de multilenguaje. El texto estático nombre entre los <th>
+                        queda como texto por default -->
+                    <th th:text="#{text.cliente.nombre}">nombre</th>
+                    <th th:text="#{text.cliente.apellido}">apellido</th>
+                    <th th:text="#{text.cliente.email}">email</th>
+                    <th th:text="#{text.cliente.createAt}">fecha</th>
                     <th sec:authorize="hasRole('ROLE_ADMIN')">crear factura</th>
                     <th sec:authorize="hasRole('ROLE_ADMIN')">editar</th>
                     <th sec:authorize="hasRole('ROLE_ADMIN')">eliminar</th>
