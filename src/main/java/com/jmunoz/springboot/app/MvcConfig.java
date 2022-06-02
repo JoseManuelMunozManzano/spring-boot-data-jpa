@@ -7,6 +7,7 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
@@ -38,7 +39,14 @@ public class MvcConfig implements WebMvcConfigurer {
     @Bean
     public LocaleResolver localeResolver() {
         // En este caso se guarda en una sesión http (sessionLocalResolver)
-        SessionLocaleResolver localeResolver = new SessionLocaleResolver();
+        // SessionLocaleResolver localeResolver = new SessionLocaleResolver();
+
+        // Ejemplo guardando en Cookie el Locale
+        // Con esto se evita que, si estoy en el idioma Inglés, cuando pulso LogOut, como se pierde la sesión
+        // el idioma vuelva al por defecto (español)
+        // Aunque se pierda la sesión, como ya tengo el idioma en una Cookie, no se pierde el idioma.
+        CookieLocaleResolver localeResolver = new CookieLocaleResolver();
+
         // Se indica código del locale y el país
         localeResolver.setDefaultLocale(new Locale("es", "ES"));
         return localeResolver;
