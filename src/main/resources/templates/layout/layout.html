@@ -1,22 +1,4 @@
 <!DOCTYPE html>
-<!-- Para trabajar con seguridad y autenticación en nuestras vistas hay que informar el namespace
-    de Spring Security para Thymeleaf -->
-<!-- Ver https://www.thymeleaf.org/doc/articles/springsecurity.html, la parte Spring Security Dialect -->
-<!-- Y https://github.com/thymeleaf/thymeleaf-extras-springsecurity, donde al final del README puede verse
-    el namespace -->
-<!-- Con esto se pueden usar atributos, que es como lo vamos a hacer nosotros porque es muy fácil de usar -->
-
-<!-- Pero en la segunda url indicada se muestra otra forma de trabajar, sin atributos, usando lenguaje de expresión
-    a través del objeto utility #authentication
-     Ejemplo para obtener el nombre:
-         <div th:text="${#authentication.name}">
-            The value of the "name" property of the authentication object should appear here.
-        </div>
-    Ejemplo para validar si el usuario es de un rol:
-        <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-          This will only be displayed if authenticated user has role ROLE_ADMIN.
-        </div>
--->
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:fragment="head">
     <meta charset="UTF-8" />
@@ -41,12 +23,8 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav navbar-right">
-                    <!-- Si ya está autenticado, que no muestre el SignIn, pero si no, que muestre el SignOut -->
                     <li sec:authorize="!isAuthenticated()"><a class="btn btn-outline-primary" th:href="@{/login}">Sign In</a></li>
 
-                    <!-- Este código de dropdown, con alguna modificación, proviene de
-                        https://getbootstrap.com/docs/4.4/components/dropdowns/ -->
-                    <!-- Para que el dropdown funcione necesitamos un JS llamado popper que ya está incluido abajo -->
                     <li sec:authorize="isAuthenticated()" class="dropdown show">
                         <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button"
                            id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -54,24 +32,26 @@
                         </a>
 
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                            <!-- Necesitamos un formulario, un botón para cerrar la sesión, porque necesitamos
-                                el token de seguridad, el csrf token, para realizar el logout de forma segura. -->
                             <form id="logoutForm" th:action="@{/logout}" method="post">
-                                <!-- Si hacemos click, cierra sesión (logout) y redirige a Login
-                                    Además, cuando cerramos sesión, debemos obtener el parámetro logout.
-                                    Cada vez que cerramos sesión, de forma automática Spring Security
-                                    nos envía una bandera, un parámetro en el URL logout, de la forma:
-                                    http://localhost:8080/login?logout
-                                    Esta bandera la obtenemos en el controlador y si es distinto de null
-                                    se manda el mensaje indicando que la sesión se ha cerrado con éxito -->
                                 <button class="dropdown-item" onclick="document.getElementById('logoutForm').submit();"
                                         type="submit">Sign Out</button>
-                                <!-- No es necesario, para eso hemos hecho el form, pero lo hacemos manualmente -->
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                             </form>
                         </div>
                     </li>
+                </ul>
 
+                <!-- Creando los links para cambiar el lenguaje -->
+                <ul class="navbar-nav navbar-right mx-4">
+                    <!-- El parámetro lang es el mismo que aparece en la configuración MvcConfig, en el interceptor -->
+                    <!-- Lo que se hace es concatenar a la url actual el parámetro ?lang=es_ES -->
+                    <!-- Esto tiene un problema. Cuando, en la vista listar, seleccionamos otra página, la url
+                        queda con el paginador así: http://localhost:8080/listar?page=2
+                        Si ahora pulsamos en un link de idioma, la url cambia a: http://localhost:8080/listar?lang=en_US
+                        Es decir, no ha mantenido la url anterior con el paginador. Esto se mejorará. -->
+                    <li class="nav-item mx-1"><a class="btn btn-outline-success" href="?lang=es_ES">ES</a></li>
+                    <li class="nav-item mx-1"><a class="btn btn-outline-success" href="?lang=en_US">EN</a></li>
+                    <li class="nav-item mx-1"><a class="btn btn-outline-success" href="?lang=de_DE">DE</a></li>
                 </ul>
             </div>
         </nav>
@@ -86,9 +66,7 @@
     <footer th:fragment="footer" class="container">
         <hr />
         <img th:src="@{/images/spring.png}" alt="Spring Logo" />
-        <!-- Validamos que el usuario esté autenticado -->
         <p sec:authorize="isAuthenticated()">
-            <!-- Nombre del usuario logeado (username) y roles del usuario -->
             Usuario logeado: <span sec:authentication="name"></span> | Roles: <span sec:authentication="principal.authorities"></span>
         </p>
         <p>
