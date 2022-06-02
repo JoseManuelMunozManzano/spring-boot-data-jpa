@@ -7,6 +7,7 @@ import com.jmunoz.springboot.app.util.paginator.PageRender;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +35,10 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
+
+// Implementación de locale en los controladores
 
 @Controller
 @SessionAttributes("cliente")
@@ -48,11 +52,10 @@ public class ClienteController {
     @Autowired
     private IUploadFileService uploadFileService;
 
-    // Usando la anotación @PreAuthorize
-    // Hace uso del método hasRole y se le pasa el role.
-    // Si hay más de un role se puede usar el método hasAnyRole y se informan los roles separados por comas.
-    // Hay más métodos que se pueden ver en la página de SpringSecurity:
-    // https://docs.spring.io/spring-security/reference/index.html
+    // A través de este bean se obtendrá el mensaje de message_xx.properties
+    @Autowired
+    private MessageSource messageSource;
+
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping(value = "/ver/{id}")
     public String ver(@PathVariable(value = "id") Long id, Model model, RedirectAttributes flash) {
@@ -69,8 +72,10 @@ public class ClienteController {
         return "ver";
     }
 
+    // Tenemos que pasar como argumento el locale
     @RequestMapping(value = {"/listar", "/"}, method = RequestMethod.GET)
-    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model, HttpServletRequest request) {
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model, HttpServletRequest request,
+                         Locale locale) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
@@ -83,15 +88,6 @@ public class ClienteController {
             logger.info("Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
         }
 
-        // Otra forma más simple de chequear la autorización del role en nuestras clases controladoras
-        // Esta clase de Spring Security envuelve el objeto HttpServletRequest (añadido como parámetro al método)
-        // y nos permite validar el role.
-        // Si revisamos la clase SecurityContextHolderAwareRequestWrapper y buscamos el método isUserInRole que
-        // invoca el método isGranted, y revisamos este método, veremos que se implementa algo muy parecido a
-        // nuestro método hasRole de abajo
-        //
-        // Se indica el prefijo y por eso en la segunda línea se indica solo ADMIN.
-        // Si el prefijo fuera blancos, entonces en la segunda línea se indicaria ROLE_ADMIN
         SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request, "ROLE_");
         if (securityContext.isUserInRole("ADMIN")) {
             logger.info("Forma usando SecurityContextHolderAwareRequestWrapper. Hola ".concat(auth.getName()).concat(" tienes acceso!"));
@@ -99,7 +95,6 @@ public class ClienteController {
             logger.info("Forma usando SecurityContextHolderAwareRequestWrapper. Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
         }
 
-        // Otra forma de validar el role usando solo el request de forma nativa
         if (request.isUserInRole("ROLE_ADMIN")) {
             logger.info("Forma usando HttpServletRequest. Hola ".concat(auth.getName()).concat(" tienes acceso!"));
         } else {
@@ -111,7 +106,8 @@ public class ClienteController {
         Page<Cliente> clientes = clienteService.findAll(pageRequest);
         PageRender<Cliente> pageRender = new PageRender<>("/listar", clientes);
 
-        model.addAttribute("titulo", "Listado de clientes");
+        // Uso de messageSource. Se indica el property, null, y el locale que se ha pasado como argumento
+        model.addAttribute("titulo", messageSource.getMessage("text.cliente.listar.titulo", null, locale));
         model.addAttribute("clientes", clientes);
         model.addAttribute("page", pageRender);
 
@@ -128,8 +124,6 @@ public class ClienteController {
         return "form";
     }
 
-    // Dando seguridad al role USER usando anotaciones
-    // Si hay más de un role, con @Secured se ponen usando las llaves y separados los roles por comas
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping(value = "/uploads/{filename:.+}")
     public ResponseEntity<Resource> verFoto(@PathVariable String filename) {
@@ -181,7 +175,6 @@ public class ClienteController {
 
         clienteService.save(cliente);
         status.setComplete();
-        // Usamos el método addFlashAttribute para mandar el mensaje flash
         flash.addFlashAttribute("success", mensajeFlash);
         return "redirect:listar";
     }
@@ -225,40 +218,19 @@ public class ClienteController {
         return "redirect:/listar";
     }
 
-    // Obtener el role programáticamente y ver si cumple o no dicho role
-    // NOTA: Por defecto SpringBoot maneja los roles con la clase SimpleGrantedAuthority que implementa la interface
-    //       GrantedAuthority.
-    // Podríamos crear nuestra propia clase role, heredando de SimpleGrantedAuthority o implementando GrantedAuthority
     private boolean hasRole(String role) {
         SecurityContext context = SecurityContextHolder.getContext();
-        // No tiene acceso
         if (context == null) {
             return false;
         }
 
         Authentication auth = context.getAuthentication();
-        // No tiene acceso
         if (auth == null) {
             return false;
         }
 
-        // Cualquier clase Role o que representa un Role en nuestra app tiene que implementar esta interface.
-        // Nos vale cualquier objeto que implemente la interface GrantedAuthority.
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
 
-        // Usando un for
-        // La ventaja es que nos permite usar el logger
-//        for (GrantedAuthority authority : authorities) {
-//            if (role.equals(authority.getAuthority())) {
-//                logger.info("Hola usuario ".concat(auth.getName()).concat(" tu role es ").concat(authority.getAuthority()));
-//                return true;
-//            }
-//        }
-
-//        return false;
-
-        // Otra forma de validar buscando si contiene el role
         return authorities.contains(new SimpleGrantedAuthority(role));
-
     }
 }
