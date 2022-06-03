@@ -12,6 +12,9 @@
 
             <h4 class="card-title">
                 <a onclick="history.back()" class="btn btn-light btx-xs" th:utext="#{text.global.volver}">&laquo; volver</a>
+                <!-- Se añade un link para exportar a PDF la factura -->
+                <!-- Notar el parámetro format que nos ayuda a saber si es un pdf... -->
+                <a class="btn btn-danger btx-xs float-right" th:href="@{'/factura/ver/' + ${factura.id}(format=pdf)}">PDF</a>
             </h4>
 
             <!-- Datos del cliente -->

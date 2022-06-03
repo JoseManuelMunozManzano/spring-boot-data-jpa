@@ -13,7 +13,8 @@ import java.util.Map;
 
 // Notar que esta clase es una VISTA
 
-// Por qué el nombre /factura/ver?
+// IMPORTANTE: La ruta estaba mal, se ha quitado el primer /
+// Por qué el nombre factura/ver?
 // Porque es el nombre que está retornando el método ver que esta mapeado a /factura/ver/{id},
 // del controlador FacturaController
 // La idea es exportar o convertir este contenido de la factura a PDF.
@@ -22,7 +23,7 @@ import java.util.Map;
 // Lo que cambia es la representación, pero los datos son los mismos, el controlador es el mismo y el método es
 // el mismo, ya sea para renderizar en pdf, en html, en json, xml, excel...
 //
-// Entonces, cómo resuelve si va a mostrar en pdf, o excel o html? A través del parámetro form.
+// Entonces, cómo resuelve si va a mostrar en pdf, o excel o html? A través del parámetro format.
 // Cuando es PDF, internamente Spring va a asociar esta bandera a un content-type que corresponde a application/pdf.
 // Si se omite ese parámetro, por defecto va a ser html.
 // Es bastante automático. Simplemente pasamos el parámetro y si es pdf buscará la vista correspondiente y cambia
@@ -35,7 +36,7 @@ import java.util.Map;
 //
 // NOTA: Si quisiéramos implementar una vista web con soporte web, sería mejor extender directamente de AbstractView.
 
-@Component("/factura/ver")
+@Component("factura/ver")
 public class FacturaPdfView extends AbstractPdfView {
 
     // El model, en el controlador, guarda datos en la vista, usando el método addAttribute() y aquí los podemos obtener
@@ -49,11 +50,13 @@ public class FacturaPdfView extends AbstractPdfView {
 
         // Se generan las tablas
         PdfPTable tabla = new PdfPTable(1);
+        tabla.setSpacingAfter(20);
         tabla.addCell("Datos del Cliente");
         tabla.addCell(factura.getCliente().getNombre() + " " + factura.getCliente().getApellido());
         tabla.addCell(factura.getCliente().getEmail());
 
         PdfPTable tabla2 = new PdfPTable(1);
+        tabla2.setSpacingAfter(20);
         tabla2.addCell("Datos de la Factura");
         tabla2.addCell("Folio: " + factura.getId());
         tabla2.addCell("Descripción: " + factura.getDescripcion());
