@@ -93,6 +93,13 @@
             <version>5.2.2</version>
         </dependency>
 
+        <!-- http://super-csv.github.io/super-csv/index.html -->
+        <dependency>
+            <groupId>net.sf.supercsv</groupId>
+            <artifactId>super-csv</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

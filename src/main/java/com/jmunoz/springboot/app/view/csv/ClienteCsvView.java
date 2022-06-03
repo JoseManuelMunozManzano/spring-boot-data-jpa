@@ -1,0 +1,43 @@
+package com.jmunoz.springboot.app.view.csv;
+
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.view.AbstractView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+
+// Se va a generar un fichero CSV con la lista de clientes existentes
+// Se nombra listar porque es la vista que se carga en el controlador ClienteController
+// Como solo tenemos una sola clase con el nombre de componente listar, no hace falta ponerle la extensión .csv
+// Estamos definiendo esta vista a través del nombre del Bean, BeanNameViewResolver
+//
+// No tenemos una vista de Spring para implementar un archivo plano. Tenemos que crearnos nuestra propia vista.
+// Para eso implementamos una clase más abstracta, AbstractView
+@Component("listar")
+public class ClienteCsvView extends AbstractView {
+
+    // Asignamos el tipo de contenido (media types o MIME types) en el constructor
+    public ClienteCsvView() {
+        setContentType("text/csv");
+    }
+
+    // Como es un archivo que se descarga, tenemos que configurar este método, indicando que el contenido
+    // si es descargable
+    @Override
+    protected boolean generatesDownloadContent() {
+        return true;
+    }
+
+    // Este método que tenemos que implementar es muy parecido al que teníamos en PDF (buildPdfDocument)
+    // y Excel (buildExcelDocument)
+    // Solo tenemos que envolver el contenido de nuestro archivo plano dentro del response.
+    @Override
+    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        // Asignamos un nombre al archivo plano
+        response.setHeader("Content-Disposition", "attachment; filename=\"clientes.csv\"");
+
+        // Pasamos el content type a la respuesta. el getContentType() pertenece a la clase que estamos heredando
+        response.setContentType(getContentType());
+    }
+}
