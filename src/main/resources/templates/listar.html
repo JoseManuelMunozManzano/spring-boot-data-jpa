@@ -17,6 +17,8 @@
 
                 <!-- Se añade un link para exportar a CSV los cliente -->
                 <a class="btn btn-success btx-xs float-right" th:href="@{'/listar'(format=csv)}">CSV</a>
+                <!-- Se añade un link para exportar a XML los cliente -->
+                <a class="btn btn-outline-success btx-xs float-right" th:href="@{'/listar'(format=xml)}">XML</a>
             </h4>
 
             <table class="table table-striped table-bordered">

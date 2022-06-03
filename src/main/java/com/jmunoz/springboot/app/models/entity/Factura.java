@@ -2,6 +2,7 @@ package com.jmunoz.springboot.app.models.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,6 +26,10 @@ public class Factura implements Serializable {
     @Column(name = "create_at")
     private Date createAt;
 
+    // Problema en la exportación xml
+    // Como un cliente tiene muchas facturas y muchas facturas un cliente, esto hace un ciclo bidireccional
+    // que acaba generando un bucle infinito en la generación del XML
+    // Tenemos que romper la bidireccionalidad en Factura para que no vuelva al cliente.
     @ManyToOne(fetch = FetchType.LAZY)
     private Cliente cliente;
 
@@ -73,6 +78,9 @@ public class Factura implements Serializable {
         this.createAt = createAt;
     }
 
+    // En el método get, ya que las anotaciones se aplican a los métodos, se indica @XmlTransient
+    // Transient significa que cuando se serializa no va a llamar a este método
+    @XmlTransient
     public Cliente getCliente() {
         return cliente;
     }
