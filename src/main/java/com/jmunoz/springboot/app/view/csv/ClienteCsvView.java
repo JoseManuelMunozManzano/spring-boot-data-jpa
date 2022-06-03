@@ -19,7 +19,12 @@ import java.util.Map;
 //
 // No tenemos una vista de Spring para implementar un archivo plano. Tenemos que crearnos nuestra propia vista.
 // Para eso implementamos una clase más abstracta, AbstractView
-@Component("listar")
+//
+// Suponiendo que vamos a tener más vistas utilizando @Component a través del BeanNameViewResolver,
+// se podría agregar la extensión .csv
+// Pero ahora, para que funcione y encuentre esta vista, hay que agregar el contentnegotiation en el fichero de
+// properties.
+@Component("listar.csv")
 public class ClienteCsvView extends AbstractView {
 
     // Asignamos el tipo de contenido (media types o MIME types) en el constructor
