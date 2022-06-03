@@ -1,7 +1,10 @@
 package com.jmunoz.springboot.app.view.pdf;
 
 import com.jmunoz.springboot.app.models.entity.Factura;
+import com.jmunoz.springboot.app.models.entity.ItemFactura;
 import com.lowagie.text.Document;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.stereotype.Component;
@@ -65,5 +68,32 @@ public class FacturaPdfView extends AbstractPdfView {
         // Se guardan las tablas en el documento
         document.add(tabla);
         document.add(tabla2);
+
+        // Detalle de la factura
+        // 4 columnas: producto, precio, cantidad y total
+        PdfPTable tabla3 = new PdfPTable(4);
+        tabla3.addCell("Producto");
+        tabla3.addCell("Precio");
+        tabla3.addCell("Cantidad");
+        tabla3.addCell("Total");
+
+        for (ItemFactura item: factura.getItems()) {
+            tabla3.addCell(item.getProducto().getNombre());
+            tabla3.addCell(item.getProducto().getPrecio().toString());
+            tabla3.addCell(item.getCantidad().toString());
+            tabla3.addCell(item.calcularImporte().toString());
+        }
+
+        // Footer con el texto Total formateado
+        // Ocupa 3 columnas y se alinea a la derecha
+        PdfPCell cell = new PdfPCell(new Phrase("Total: "));
+        cell.setColspan(3);
+        cell.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
+        tabla3.addCell(cell);
+        // La 4 columna con el total
+        tabla3.addCell(factura.getTotal().toString());
+
+        // Se guarda la tabla en el documento
+        document.add(tabla3);
     }
 }
