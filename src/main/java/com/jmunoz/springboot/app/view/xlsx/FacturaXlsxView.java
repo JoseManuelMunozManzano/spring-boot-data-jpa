@@ -3,6 +3,7 @@ package com.jmunoz.springboot.app.view.xlsx;
 import com.jmunoz.springboot.app.models.entity.Factura;
 import com.jmunoz.springboot.app.models.entity.ItemFactura;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.document.AbstractXlsxView;
 
@@ -32,10 +33,13 @@ public class FacturaXlsxView extends AbstractXlsxView {
 
         Sheet sheet = workbook.createSheet("Factura Spring");
 
+        // Para multilenguaje. Lo hacemos directamente de la segunda forma.
+        MessageSourceAccessor mensajes = getMessageSourceAccessor();
+
         // Primera forma de informar los datos en el Excel es a través de los objetos row y cell
         Row row = sheet.createRow(0);
         Cell cell = row.createCell(0);
-        cell.setCellValue("Datos del Cliente");
+        cell.setCellValue(mensajes.getMessage("text.factura.ver.datos.cliente"));
 
         row = sheet.createRow(1);
         cell = row.createCell(0);
@@ -46,10 +50,10 @@ public class FacturaXlsxView extends AbstractXlsxView {
         cell.setCellValue(factura.getCliente().getEmail());
 
         // Segunda forma de informar los datos en el Excel más sencilla y directa sería encadenando métodos
-        sheet.createRow(4).createCell(0).setCellValue("Datos de la factura");
-        sheet.createRow(5).createCell(0).setCellValue("Folio: " + factura.getId());
-        sheet.createRow(6).createCell(0).setCellValue("Descripción: " + factura.getDescripcion());
-        sheet.createRow(7).createCell(0).setCellValue("Fecha: " + factura.getCreateAt());
+        sheet.createRow(4).createCell(0).setCellValue(mensajes.getMessage("text.factura.ver.datos.factura"));
+        sheet.createRow(5).createCell(0).setCellValue(mensajes.getMessage("text.cliente.factura.folio") + ": " + factura.getId());
+        sheet.createRow(6).createCell(0).setCellValue(mensajes.getMessage("text.cliente.factura.descripcion") + ": " + factura.getDescripcion());
+        sheet.createRow(7).createCell(0).setCellValue(mensajes.getMessage("text.cliente.factura.fecha") + ": " + factura.getCreateAt());
 
         // Estilos
         CellStyle theaderStyle = workbook.createCellStyle();
@@ -70,10 +74,10 @@ public class FacturaXlsxView extends AbstractXlsxView {
 
         // Detalle de la factura
         Row header = sheet.createRow(9);
-        header.createCell(0).setCellValue("Producto");
-        header.createCell(1).setCellValue("Precio");
-        header.createCell(2).setCellValue("Cantidad");
-        header.createCell(3).setCellValue("Total");
+        header.createCell(0).setCellValue(mensajes.getMessage("text.factura.form.item.nombre"));
+        header.createCell(1).setCellValue(mensajes.getMessage("text.factura.form.item.precio"));
+        header.createCell(2).setCellValue(mensajes.getMessage("text.factura.form.item.cantidad"));
+        header.createCell(3).setCellValue(mensajes.getMessage("text.factura.form.item.total"));
 
         // Se aplican los estilos
         header.getCell(0).setCellStyle(theaderStyle);
@@ -104,7 +108,7 @@ public class FacturaXlsxView extends AbstractXlsxView {
 
         Row filaTotal = sheet.createRow(rownum);
         cell = filaTotal.createCell(2);
-        cell.setCellValue("Gran Total: ");
+        cell.setCellValue(mensajes.getMessage("text.factura.form.total") + ": ");
         cell.setCellStyle(tbodyStyle);
 
         cell = filaTotal.createCell(3);
