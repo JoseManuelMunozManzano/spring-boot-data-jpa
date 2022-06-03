@@ -7,12 +7,16 @@ import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.view.document.AbstractPdfView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
+import java.util.Locale;
 import java.util.Map;
 
 // Notar que esta clase es una VISTA
@@ -43,6 +47,14 @@ import java.util.Map;
 @Component("factura/ver")
 public class FacturaPdfView extends AbstractPdfView {
 
+    // Primera forma de añadir multileguaje
+    // Es lo mismo que hicimos en LoginSuccessHandler
+    @Autowired
+    private MessageSource messageSource;
+
+    @Autowired
+    private LocaleResolver localeResolver;
+
     // El model, en el controlador, guarda datos en la vista, usando el método addAttribute() y aquí los podemos obtener
     // document representa el documento pdf del API iText
     // writer es el escritor pdf
@@ -52,12 +64,15 @@ public class FacturaPdfView extends AbstractPdfView {
         // Hay que hacer un cast, ya que se añade y recuperan objetos, tipo Object
         Factura factura = (Factura) model.get("factura");
 
+        // Para multilenguaje. Primera forma
+        Locale locale = localeResolver.resolveLocale(request);
+
         // Se generan las tablas
         PdfPTable tabla = new PdfPTable(1);
         tabla.setSpacingAfter(20);
 
         PdfPCell cell = null;
-        cell = new PdfPCell(new Phrase("Datos del Cliente"));
+        cell = new PdfPCell(new Phrase(messageSource.getMessage("text.factura.ver.datos.cliente", null, locale)));
         cell.setBackgroundColor(new Color(184, 218, 255));
         cell.setPadding(8f);
         tabla.addCell(cell);
@@ -68,7 +83,7 @@ public class FacturaPdfView extends AbstractPdfView {
         PdfPTable tabla2 = new PdfPTable(1);
         tabla2.setSpacingAfter(20);
 
-        cell = new PdfPCell(new Phrase("Datos de la Factura"));
+        cell = new PdfPCell(new Phrase(messageSource.getMessage("text.factura.ver.datos.factura", null, locale)));
         cell.setBackgroundColor(new Color(195, 230, 203));
         cell.setPadding(8f);
         tabla2.addCell(cell);
