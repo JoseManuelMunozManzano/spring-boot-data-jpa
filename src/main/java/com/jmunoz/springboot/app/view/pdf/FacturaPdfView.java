@@ -9,6 +9,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.view.document.AbstractPdfView;
@@ -47,8 +48,8 @@ import java.util.Map;
 @Component("factura/ver")
 public class FacturaPdfView extends AbstractPdfView {
 
-    // Primera forma de añadir multileguaje
-    // Es lo mismo que hicimos en LoginSuccessHandler
+    // Primera forma de añadir multilenguaje
+    // Es lo mismo que hicimos en LoginSuccessHandler. Inyectamos MessageSource y LocaleResolver
     @Autowired
     private MessageSource messageSource;
 
@@ -66,6 +67,11 @@ public class FacturaPdfView extends AbstractPdfView {
 
         // Para multilenguaje. Primera forma
         Locale locale = localeResolver.resolveLocale(request);
+
+        // Para multilenguaje. Segunda forma más sencilla heredada de la superclase
+        // Con este objeto se puede traducir de forma directa, ya que por debajo maneja el Locale y trabaja por debajo
+        // con el messageSource
+        MessageSourceAccessor mensajes = getMessageSourceAccessor();
 
         // Se generan las tablas
         PdfPTable tabla = new PdfPTable(1);
@@ -88,9 +94,10 @@ public class FacturaPdfView extends AbstractPdfView {
         cell.setPadding(8f);
         tabla2.addCell(cell);
 
-        tabla2.addCell("Folio: " + factura.getId());
-        tabla2.addCell("Descripción: " + factura.getDescripcion());
-        tabla2.addCell("Fecha: " + factura.getCreateAt());
+        // Usando mensajes.getMessages. La segunda forma
+        tabla2.addCell(mensajes.getMessage("text.cliente.factura.folio") + ": " + factura.getId());
+        tabla2.addCell(mensajes.getMessage("text.cliente.factura.descripcion") + ": " + factura.getDescripcion());
+        tabla2.addCell(mensajes.getMessage("text.cliente.factura.fecha") + ": " + factura.getCreateAt());
 
         // Se guardan las tablas en el documento
         document.add(tabla);
@@ -102,10 +109,10 @@ public class FacturaPdfView extends AbstractPdfView {
         // Las medidas son relativas. La primera columna es 3.5 veces más grande que las otras 3 columnas, que son iguales.
         tabla3.setWidths(new float[] {3.5f, 1, 1, 1});
 
-        tabla3.addCell("Producto");
-        tabla3.addCell("Precio");
-        tabla3.addCell("Cantidad");
-        tabla3.addCell("Total");
+        tabla3.addCell(mensajes.getMessage("text.factura.form.item.nombre"));
+        tabla3.addCell(mensajes.getMessage("text.factura.form.item.precio"));
+        tabla3.addCell(mensajes.getMessage("text.factura.form.item.cantidad"));
+        tabla3.addCell(mensajes.getMessage("text.factura.form.item.total"));
 
         for (ItemFactura item: factura.getItems()) {
             tabla3.addCell(item.getProducto().getNombre());
@@ -120,7 +127,7 @@ public class FacturaPdfView extends AbstractPdfView {
 
         // Footer con el texto Total formateado
         // Ocupa 3 columnas y se alinea a la derecha
-        cell = new PdfPCell(new Phrase("Total: "));
+        cell = new PdfPCell(new Phrase(mensajes.getMessage("text.factura.form.total") + ": "));
         cell.setColspan(3);
         cell.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
         tabla3.addCell(cell);
