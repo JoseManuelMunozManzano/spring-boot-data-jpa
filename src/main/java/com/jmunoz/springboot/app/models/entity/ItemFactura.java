@@ -17,13 +17,25 @@ public class ItemFactura implements Serializable {
 
     private Integer cantidad;
 
-    // Muchos itemFactura, un producto (podría se también @OneToOne, pero lo importante es el ToOne, la relación
-    // por el lado del ItemFactura)
+    // Otro problema que se da en la conversión a JSON esta relacionado con esta carga perezosa.
+    // Por qué? Porque hay atributos que no se pueden serializar de forma correcta.
+    // Hay una relación de Factura con los ItemFactura y de los Item con Producto.
     //
-    // Por defecto, ya que estamos mapeando producto, va a crear el atributo producto_id en la tabla facturas_items
-    // de forma automática, pero igual se puede especificar de forma explícita con @JoinColumn
-    // Así relacionamos la tabla facturas_items con la tabla productos.
-    @ManyToOne(fetch = FetchType.LAZY)
+    // En concreto el problema viene del atributo de Producto llamado handler.
+    // En teoría Producto no tiene ningún atributo que se llame handler, PERO SI QUE LO TIENE,
+    // Por qué? Porque no es el objeto producto original, es un proxy, ya que lo estamos cargando de manera perezosa
+    // a través del LAZY. Cada vez que se llama al atributo producto a través del método get, en ese momento es
+    // cuando se realiza la consulta y se obtiene el producto, pero se mantiene como un proxy, no como un tipo
+    // original. Es un proxy que hereda de producto, y tiene algunos atributos extra como por ejemplo handler,
+    // hibernateLazyInitializer...
+    //
+    // Una solución poco práctica, pero la más simple es sustituir FetchType.LAZY por FetchType.EAGER
+    // Con esto se traen los productos inmediatamente. Junto con los itemFactura ya va a traer los productos,
+    // como objeto original, sin proxy, por tanto, si atributos extra.
+    // El problema es que esto es poco eficiente, y a lo mejor no queremos todos los elementos de la relación.
+    // A lo mejor no queríamos los productos.
+    // Aunque en este ejemplo en concreto, los itemFactura y los productos siempre se deben mostrar juntos.
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "producto_id")
     private Producto producto;
 
