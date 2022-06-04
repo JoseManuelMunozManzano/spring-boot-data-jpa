@@ -35,6 +35,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -235,4 +236,31 @@ public class ClienteController {
 
         return authorities.contains(new SimpleGrantedAuthority(role));
     }
+
+    // Esta segunda forma de implementar un API Rest es automática y se basa en crear NO UNA CLASE VISTA, sino un método
+    // handler del CONTROLADOR que se encarga únicamente de renderizar una vista del tipo REST, ya sea JSON o XML.
+    //
+    // En vez de retornar un String hay que devolver un objeto simple de Java (POJO) o un JavaBean que queramos
+    // desplegar (mostrar) sus atributos en formato JSON o XML
+    // Y no se nos olvide incluir @ResponseBody, que indica que la respuesta es de tipo REST.
+    // También nos dice que el listado de clientes se va a almacenar en el body de la respuesta.
+    // Al guardarse, de forma automática, Spring va a deducir que es un REST
+    //
+    // Todas las anotaciones @Json que se aplicaron en los entities también se aplican a esta forma de implementación,
+    // ya que solo cambia la forma en la que se despliega la vista.
+    // Otra diferencia es que el atributo clientes no nos aparece al principio del documento JSON, como si aparece
+    // cuando se usa la implementación de clase vista, porque ese clientes corresponde al nombre que le dimos
+    // en model.put("clientes", clientes.getContent()); y que contiene los clientes.
+    // Aquí no tenemos nombre para la lista de clientes, solo se devuelve, de ahí que no aparezca ningún nombre en el
+    // documento JSON. Si nos hiciera falta ese nombre, se podría colocar como argumento el Model y añadir ese
+    // atributo.
+    //
+    // NOTA: Para probar JSON poner la ruta
+    // http://localhost:8080/listar-rest
+    @GetMapping(value = "/listar-rest")
+    public @ResponseBody List<Cliente> listarRest() {
+
+        return clienteService.findAll();
+    }
+
 }
