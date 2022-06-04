@@ -1,5 +1,7 @@
 package com.jmunoz.springboot.app.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
@@ -29,14 +31,14 @@ public class ItemFactura implements Serializable {
     // original. Es un proxy que hereda de producto, y tiene algunos atributos extra como por ejemplo handler,
     // hibernateLazyInitializer...
     //
-    // Una solución poco práctica, pero la más simple es sustituir FetchType.LAZY por FetchType.EAGER
-    // Con esto se traen los productos inmediatamente. Junto con los itemFactura ya va a traer los productos,
-    // como objeto original, sin proxy, por tanto, si atributos extra.
-    // El problema es que esto es poco eficiente, y a lo mejor no queremos todos los elementos de la relación.
-    // A lo mejor no queríamos los productos.
-    // Aunque en este ejemplo en concreto, los itemFactura y los productos siempre se deben mostrar juntos.
-    @ManyToOne(fetch = FetchType.EAGER)
+    // La segunda solución, mucho mejor, es seguir dejando FetchType.LAZY y agregar una nueva anotación
+    // llamada @JsonIgnoreProperties
+    // Sirve para que se ignoren algunos atributos del objeto Producto.
+    // Esta anotación puede ir sobre el atributo o sobre la clase Producto.
+    // Hay que indicar un arreglo de Strings con los nombres de los atributos que queremos ignorar.
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Producto producto;
 
     public Long getId() {
