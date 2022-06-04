@@ -1,5 +1,6 @@
 package com.jmunoz.springboot.app.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -39,22 +40,13 @@ public class Cliente implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createAt;
 
-    // Un cliente puede tener muchas facturas
-    //
-    // Aquí indicar LAZY es todavía más importante para evitar que se traiga todas las facturas de cada cliente (EAGER)
-    //
-    // CascadeType.ALL indica que todas las operaciones delete y persist se van a realizar en cadena. Por ejemplo,
-    // cuando al Cliente se le asignen varias facturas y el cliente se persiste con el método persist, automáticamente
-    // va a persistir también a sus elementos hijos (facturas)
-    // O si el cliente se elimina, también se van a eliminar automáticamente todas sus facturas.
-    //
-    // Con mappedBy se hace bidireccional. Se indica que cliente va a tener una lista de facturas y factura va a
-    // tener un cliente. El nombre es el que aparece en la clase Factura. De forma automática se crea la clave
-    // foránea cliente_id en la tabla facturas para relacionar ambas tablas.
-    //
-    // Se añade orphanRemoval a true que es opcional y sirve para eliminar registros huérfanos que no están
-    // asociados a ningún cliente
+    // Problema con la exportación JSON
+    // Como es una relación bidireccional, el cliente tiene facturas y las facturas son de un cliente,
+    // esto genera un bucle infinito.
+    // Para evitarlo, vamos a romper la bidireccionalidad vamos a omitir las facturas
+    // Se usa la anotación @JSonIgnore
     @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Factura> facturas;
 
     private String foto;
