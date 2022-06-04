@@ -33,8 +33,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // Con listar** también se da autorización a nuestra nueva ruta listar-rest
-        http.authorizeRequests().antMatchers("/", "/css/**", "/js/**", "/images/**", "/listar**", "/locale").permitAll()
+        // Agregamos la seguridad para nuestro RestController
+        http.authorizeRequests().antMatchers("/", "/css/**", "/js/**", "/images/**", "/listar**", "/locale", "/api/clientes/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                     .formLogin()
