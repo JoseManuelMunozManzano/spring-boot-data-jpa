@@ -1,5 +1,7 @@
 package com.jmunoz.springboot.app.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.xml.bind.annotation.XmlTransient;
@@ -30,7 +32,11 @@ public class Factura implements Serializable {
     // Como un cliente tiene muchas facturas y muchas facturas un cliente, esto hace un ciclo bidireccional
     // que acaba generando un bucle infinito en la generación del XML
     // Tenemos que romper la bidireccionalidad en Factura para que no vuelva al cliente.
+    //
+    // Aquí, para JSON, informamos la anotación @JsonBackReference porque esta parte de la relación no la queremos
+    // serializar en el JSON, para evitar el bucle infinito
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     private Cliente cliente;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

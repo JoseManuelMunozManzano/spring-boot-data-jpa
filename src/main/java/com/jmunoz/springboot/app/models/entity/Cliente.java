@@ -1,6 +1,6 @@
 package com.jmunoz.springboot.app.models.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -41,12 +41,17 @@ public class Cliente implements Serializable {
     private Date createAt;
 
     // Problema con la exportación JSON
-    // Como es una relación bidireccional, el cliente tiene facturas y las facturas son de un cliente,
-    // esto genera un bucle infinito.
-    // Para evitarlo, vamos a romper la bidireccionalidad vamos a omitir las facturas
-    // Se usa la anotación @JSonIgnore
+    // El problema que tiene ahora mismo esta conversión a JSON es que los entities CLIENTE y FACTURA
+    // tienen una relación de bidireccionalidad.
+    // Un cliente tiene muchas facturas y una factura es de un cliente. Esto genera un bucle infinito.
+    // Pero el API Jackson maneja un par de anotaciones para manejar las relaciones que tienen los objetos.
+    // Se ha eliminado la anotación @JsonIgnore porque queremos mostrar las facturas, pero en un sentido
+    // unidireccional desde Cliente hacia Factura
+    // Para eso se usa la anotación @JsonManagedReference en combinación con la anotación @JsonBackReference,
+    // esta última en la clase Factura.
+    // @JsonManagedReference es la parte que si queremos serializar, la que queremos mostrar.
     @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @JsonManagedReference
     private List<Factura> facturas;
 
     private String foto;
