@@ -4,6 +4,7 @@ import com.jmunoz.springboot.app.models.entity.Cliente;
 import com.jmunoz.springboot.app.models.service.IClienteService;
 import com.jmunoz.springboot.app.models.service.IUploadFileService;
 import com.jmunoz.springboot.app.util.paginator.PageRender;
+import com.jmunoz.springboot.app.view.xml.CilenteList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -257,10 +258,23 @@ public class ClienteController {
     //
     // NOTA: Para probar JSON poner la ruta
     // http://localhost:8080/listar-rest
+    //
+    // Y esto también vale, en principio, para mostrar el XML, pero no olvidar que necesitamos una clase wrapper
+    // y, por tanto, también debemos de cambiar la clase de retorno a ese wrapper.
+    // Para probar XML poner la ruta
+    // http://localhost:8080/listar-rest?format=xml
+    //
+    // Ahora nos funciona tanto para JSON como para XML
+    // Pero si solamente nos hiciera falta JSON, no haría falta la clase wrapper.
+    // Otra cosa importante es que, si tenemos implementado tanto JSON como XML, por defecto, poniendo la ruta
+    // http://localhost:8080/listar-rest
+    // ya sale XML
+    // Si queremos ver el JSON, la ruta a informar es
+    // http://localhost:8080/listar-rest?format=json
     @GetMapping(value = "/listar-rest")
-    public @ResponseBody List<Cliente> listarRest() {
+    public @ResponseBody CilenteList listarRest() {
 
-        return clienteService.findAll();
+        return new CilenteList(clienteService.findAll());
     }
 
 }
