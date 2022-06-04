@@ -35,7 +35,7 @@ public class ClienteListXmlView extends MarshallingView {
         // Con el model ya limpio, guardamos el wrapper ClienteList con el listado de clientes.
         // Notar que este ejemplo se hace con los clientes paginados, no con todos.
         // Si queremos todos, tenemos que hacer una consulta para obtener todos los clientes.
-        model.put("clienteList", new CilenteList(clientes.getContent()));
+        model.put("clienteList", new ClienteList(clientes.getContent()));
 
         super.renderMergedOutputModel(model, request, response);
     }

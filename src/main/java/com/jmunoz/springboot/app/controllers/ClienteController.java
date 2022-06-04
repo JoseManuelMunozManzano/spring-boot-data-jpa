@@ -4,7 +4,7 @@ import com.jmunoz.springboot.app.models.entity.Cliente;
 import com.jmunoz.springboot.app.models.service.IClienteService;
 import com.jmunoz.springboot.app.models.service.IUploadFileService;
 import com.jmunoz.springboot.app.util.paginator.PageRender;
-import com.jmunoz.springboot.app.view.xml.CilenteList;
+import com.jmunoz.springboot.app.view.xml.ClienteList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -272,9 +271,9 @@ public class ClienteController {
     // Si queremos ver el JSON, la ruta a informar es
     // http://localhost:8080/listar-rest?format=json
     @GetMapping(value = "/listar-rest")
-    public @ResponseBody CilenteList listarRest() {
+    public @ResponseBody ClienteList listarRest() {
 
-        return new CilenteList(clienteService.findAll());
+        return new ClienteList(clienteService.findAll());
     }
 
 }

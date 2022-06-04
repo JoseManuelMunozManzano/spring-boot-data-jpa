@@ -1,5 +1,6 @@
 package com.jmunoz.springboot.app;
 
+import com.jmunoz.springboot.app.view.xml.ClienteList;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -58,7 +59,7 @@ public class MvcConfig implements WebMvcConfigurer {
     public Jaxb2Marshaller jaxb2Marshaller() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
         // Las clases que se van a convertir en XML (la clase wrapper)
-        marshaller.setClassesToBeBound(new Class[] {com.jmunoz.springboot.app.view.xml.CilenteList.class});
+        marshaller.setClassesToBeBound(new Class[] {ClienteList.class});
         return marshaller;
     }
 }

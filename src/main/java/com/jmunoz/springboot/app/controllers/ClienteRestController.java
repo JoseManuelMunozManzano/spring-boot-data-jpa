@@ -1,7 +1,7 @@
 package com.jmunoz.springboot.app.controllers;
 
 import com.jmunoz.springboot.app.models.service.IClienteService;
-import com.jmunoz.springboot.app.view.xml.CilenteList;
+import com.jmunoz.springboot.app.view.xml.ClienteList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +23,8 @@ public class ClienteRestController {
 
     // Ya no hace falta anotar con @ResponseBody porque ya la maneja @RestController
     @GetMapping(value = "/listar")
-    public CilenteList listar() {
+    public ClienteList listar() {
 
-        return new CilenteList(clienteService.findAll());
+        return new ClienteList(clienteService.findAll());
     }
 }

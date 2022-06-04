@@ -9,7 +9,7 @@ import java.util.List;
 // Esta es nuestra clase wrapper
 // Si no se le asigna un nombre, por defecto toma el nombre de la clase
 @XmlRootElement(name = "clientes")
-public class CilenteList {
+public class ClienteList {
 
     // Tenemos que indicar cuál es el atributo que va a ser un elemento XML por cada objeto cliente que tengamos
     @XmlElement(name = "cliente")
@@ -17,10 +17,10 @@ public class CilenteList {
 
     // Importante que tenga el constructor vacío para que lo pueda manejar el Jaxb2Marshaller, el Bean encargado
     // de convertir
-    public CilenteList() {
+    public ClienteList() {
     }
 
-    public CilenteList(List<Cliente> clientes) {
+    public ClienteList(List<Cliente> clientes) {
         this.clientes = clientes;
     }
 
